@@ -666,7 +666,7 @@ if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
     round(szk$status_2021_10[[1]]$tylko_nauka * 100),
     "% uczestniczyło w edukacji, ale nie pracowało. Ani dwutygodniowego okresu pracy zarobkowej, ani takiego okresu nauki, nie miało w październiku ",
     round(szk$status_2021_10[[1]]$brak_nauka_brak_praca * 100),
-    "%.\n\n\textcolor{gray}{Dla absolwentów wszystkich szkół rozpatrywano sytuację w październiku 20210 roku, żeby uwzględnić ewentualne rozpoczynanie nauki na studiach po ukończeniu szkół techników i szkół policealnych.}",
+    "%.\n\n\textcolor{gray}{Dla absolwentów wszystkich szkół rozpatrywano sytuację w październiku 2021 roku, żeby uwzględnić ewentualne rozpoczynanie nauki na studiach po ukończeniu szkół techników i szkół policealnych.}",
     sep = ""
   )
 } else {
@@ -726,8 +726,35 @@ if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
 }
 ```
 
-**UZUPEŁNIĆ TU JAK TOMEK WPROWADZI POPRAWKI**
-
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
+  tabela = tab %>% 
+    select(-lab) %>% 
+    mutate(across(value,
+                  ~paste0(round(. * 100), "%"))) %>% 
+    pivot_wider(names_from = typ) %>% 
+    kable("latex", booktabs = TRUE,
+          col.names = NULL, linesep = "",
+          align = "lcc") %>%
+    kable_styling(position = wyrownanieTabWykr,
+                  latex_options = "hold_position") %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły z województwa" = 1))
+  
+  cat(
+    "*Wykres przedstawia rozkład zmiennej utworzonej na podstawie pytań: “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): studiował(a) P. lub uczył(a) się P. w szkole / pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny . zarobkowo / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”. Wykres uwzględnia odpowiedzi dotyczące października, udzielone przez ",
+    szk$status_2021_10[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$status_2021_10_WT[[1]]$n),
+    " absolwentów innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ".*\n\nDane z wykresu przedstawiono szczegółowo w poniższej tabeli.\n\n",
+    tabela, 
+    sep = ""
+  )
+}
+```
 
 `r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
 
@@ -874,16 +901,439 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
 ### Ogólne zadowolenie z pracy
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
-
+if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Spośród absolwentów Państwa szkoły, którzy po zakończeniu nauki w ",
+    szk$formy[[1]]$typ_szk_dop_lp,
+    " pracowali, ",
+    round(szk$zad_ogolne[[1]]$t2b * 100),
+    "% wyraziło ogólne zadowolenie ze swojej pierwszej pracy po zakończeniu nauki w szkole. Niezadowolonych było ",
+    if (round(szk$zad_ogolne[[1]]$t2b * 100) == round(szk$zad_ogolne[[1]]$b2b * 100)) {
+      paste0("tyle samo absolwentów.")
+    } else if (round(szk$zad_ogolne[[1]]$t2b * 100) > round(szk$zad_ogolne[[1]]$b2b * 100)) {
+      paste0("mniej, bo ", round(szk$zad_ogolne[[1]]$b2b * 100), "% absolwentów.")
+    } else if (round(szk$zad_ogolne[[1]]$t2b * 100) < round(szk$zad_ogolne[[1]]$b2b * 100)) {
+      paste0("więcej, bo: ", round(szk$zad_ogolne[[1]]$b2b * 100), "% absolwentów.")
+    },
+    " Pozostali wybrali odpowiedź pośrednią (",
+    round(szk$zad_ogolne[[1]]$ani_ani * 100),
+    "%) lub nie byli w stanie ocenić, na ile są zadowoleni (",
+    round(szk$zad_ogolne[[1]]$trud_pow * 100),
+    "%).",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
 ```
 
-### Możliwości rozwoju zawodowego
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 4.5}
+if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zad_ogolne[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zad_ogolne_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>%   
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Opinie absolwentów dotyczące ogólnego poziomu zadowolenia z podjętej pracy zarobkowej"),
+    width = 80)
+  
+  ggplot(tab, aes(x = typ, y = value, fill = name)) +
+    geom_col(width = 0.75, stat = "identity", colour = "white", position = "stack") +
+    geom_text(aes(label = lab), size = 3, position = position_stack(vjust = 0.5)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    ylab(NULL) +
+    xlab(NULL) +
+    theme(legend.position = "bottom",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    guides(fill = guide_legend(reverse = FALSE, nrow = 6, byrow = TRUE)) +
+    scale_fill_brewer(palette = "RdPu")
+}
+```
 
-### Możliwości godzenia pracy z życiem poza pracą
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zad_ogolne[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zad_ogolne_WT[[1]]$n),
+    " innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę… ogólnie, biorąc wszystko pod uwagę”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    sep = ""
+  )
+}
+```
+
+### Możliwości doskonalenia umiejętności
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Z możliwości doskonalenia umiejętności, jakie dawała pierwsza  praca po zakończeniu nauki w szkole, zadowolonych było ",
+    round(szk$zad_rozwoj[[1]]$t2b * 100),
+    "% spośród pracujących zarobkowo absolwentów Państwa szkoły. Z kolei niezadowolonych pod tym względem było ",
+    if (round(szk$zad_rozwoj[[1]]$t2b * 100) == round(szk$zad_rozwoj[[1]]$b2b * 100)) {
+      paste0("tyle samo.")
+    } else if (round(szk$zad_rozwoj[[1]]$t2b * 100) > round(szk$zad_rozwoj[[1]]$b2b * 100)) {
+      paste0("mniej: ", round(szk$zad_rozwoj[[1]]$b2b * 100), "%.")
+    } else if (round(szk$zad_rozwoj[[1]]$t2b * 100) < round(szk$zad_rozwoj[[1]]$b2b * 100)) {
+      paste0("więcej: ", round(szk$zad_rozwoj[[1]]$b2b * 100), "%.")
+    },
+    " Pozostali wybrali odpowiedź pośrednią (",
+    round(szk$zad_rozwoj[[1]]$ani_ani * 100),
+    "%) lub nie byli w stanie ocenić, na ile są zadowoleni (",
+    round(szk$zad_rozwoj[[1]]$trud_pow * 100),
+    "%).",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 4.5}
+if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zad_rozwoj[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zad_rozwoj_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>%   
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Opinie absolwentów dotyczące poziomu zadowolenia z możliwości rozwoju zawodowego w podjętej pracy zarobkowej"),
+    width = 80)
+  
+  ggplot(tab, aes(x = typ, y = value, fill = name)) +
+    geom_col(width = 0.75, stat = "identity", colour = "white", position = "stack") +
+    geom_text(aes(label = lab), size = 3, position = position_stack(vjust = 0.5)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    ylab(NULL) +
+    xlab(NULL) +
+    theme(legend.position = "bottom",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    guides(fill = guide_legend(reverse = FALSE, nrow = 6, byrow = TRUE)) +
+    scale_fill_brewer(palette = "RdPu")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zad_rozwoj[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zad_rozwoj_WT[[1]]$n),
+    " absolwentów innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem możliwości doskonalenia umiejętności.”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    sep = ""
+  )
+}
+```
+
+### Możliwości łączenia pracy z życiem poza pracą
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Pod względem możliwości godzenia wykonywanej pracy z “życiem poza pracą” usatysfakcjonowanych było ",
+    round(szk$zad_zycie[[1]]$t2b * 100),
+    "% spośród absolwentów Państwa szkoły, którzy pracowali zarobkowo. Przeciwną opinię wyraziło ",
+    if (round(szk$zad_zycie[[1]]$t2b * 100) == round(szk$zad_zycie[[1]]$b2b * 100)) {
+      paste0("tyle samo absolwentów.")
+    } else if (round(szk$zad_zycie[[1]]$t2b * 100) > round(szk$zad_zycie[[1]]$b2b * 100)) {
+      paste0("mniej absolwentów.: ", round(szk$zad_zycie[[1]]$b2b * 100), "%.")
+    } else if (round(szk$zad_zycie[[1]]$t2b * 100) < round(szk$zad_zycie[[1]]$b2b * 100)) {
+      paste0("więcej absolwentów, bo ", round(szk$zad_zycie[[1]]$b2b * 100), "%.")
+    },
+    " Pozostali wybrali odpowiedź pośrednią (",
+    round(szk$zad_zycie[[1]]$ani_ani * 100),
+    "%) lub nie byli w stanie ocenić, na ile są zadowoleni (",
+    round(szk$zad_zycie[[1]]$trud_pow * 100),
+    "%).",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 4.5}
+if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zad_zycie[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zad_zycie_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>%   
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Opinie absolwentów dotyczące poziomu zadowolenia z możliwości godzenia pracy zarobkowej z życiem poza pracą"),
+    width = 80)
+  
+  ggplot(tab, aes(x = typ, y = value, fill = name)) +
+    geom_col(width = 0.75, stat = "identity", colour = "white", position = "stack") +
+    geom_text(aes(label = lab), size = 3, position = position_stack(vjust = 0.5)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    ylab(NULL) +
+    xlab(NULL) +
+    theme(legend.position = "bottom",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    guides(fill = guide_legend(reverse = FALSE, nrow = 6, byrow = TRUE)) +
+    scale_fill_brewer(palette = "RdPu")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zad_zycie[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zad_zycie_WT[[1]]$n),
+    " absolwentów innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem możliwości łączenia pracy z życiem poza pracą”. Respondenci wskazywali odpowiedź: “Bardzo dobrze”, “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    sep = ""
+  )
+}
+```
 
 ### Satysfakcja z poziom zarobków
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Zarobkami usatysfakcjonowanych było ",
+    round(szk$zad_zarobki[[1]]$t2b * 100),
+    "% spośród pracujących absolwentów Państwa szkoły. Niezadowolenie z wysokości zarobków wyraziło ",
+    if (round(szk$zad_zarobki[[1]]$t2b * 100) == round(szk$zad_zarobki[[1]]$b2b * 100)) {
+      paste0("tyle samo absolwentów.")
+    } else if (round(szk$zad_zarobki[[1]]$t2b * 100) > round(szk$zad_zarobki[[1]]$b2b * 100)) {
+      paste0("mniej absolwentów, bo ", round(szk$zad_zarobki[[1]]$b2b * 100), "%.")
+    } else if (round(szk$zad_zarobki[[1]]$t2b * 100) < round(szk$zad_zarobki[[1]]$b2b * 100)) {
+      paste0("więcej absolwentów, bo ", round(szk$zad_zarobki[[1]]$b2b * 100), "%.")
+    },
+    " Pozostali wybrali odpowiedź pośrednią (",
+    round(szk$zad_zarobki[[1]]$ani_ani * 100),
+    "%) lub nie byli w stanie ocenić, na ile są zadowoleni (",
+    round(szk$zad_zarobki[[1]]$trud_pow * 100),
+    "%).",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 4.5}
+if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zad_zarobki[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zad_zarobki_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>%   
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Opinie absolwentów dotyczące poziomu satysfakcji z uzyskiwanych zarobków"),
+    width = 80)
+  
+  ggplot(tab, aes(x = typ, y = value, fill = name)) +
+    geom_col(width = 0.75, stat = "identity", colour = "white", position = "stack") +
+    geom_text(aes(label = lab), size = 3, position = position_stack(vjust = 0.5)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    ylab(NULL) +
+    xlab(NULL) +
+    theme(legend.position = "bottom",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    guides(fill = guide_legend(reverse = FALSE, nrow = 6, byrow = TRUE)) +
+    scale_fill_brewer(palette = "RdPu")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zad_zarobki[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zad_zarobki_WT[[1]]$n),
+    " absolwentów innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem zarobków”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    sep = ""
+  )
+}
+```
+
 ### Pewność utrzymania pracy
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Zarobkami usatysfakcjonowanych było ",
+    round(szk$zad_utrzym[[1]]$t2b * 100),
+    "% spośród pracujących absolwentów Państwa szkoły. Niezadowolenie z wysokości zarobków wyraziło ",
+    if (round(szk$zad_utrzym[[1]]$t2b * 100) == round(szk$zad_utrzym[[1]]$b2b * 100)) {
+      paste0("tyle samo absolwentów.")
+    } else if (round(szk$zad_utrzym[[1]]$t2b * 100) > round(szk$zad_utrzym[[1]]$b2b * 100)) {
+      paste0("mniej absolwentów, bo ", round(szk$zad_utrzym[[1]]$b2b * 100), "%.")
+    } else if (round(szk$zad_utrzym[[1]]$t2b * 100) < round(szk$zad_utrzym[[1]]$b2b * 100)) {
+      paste0("więcej absolwentów, bo ", round(szk$zad_utrzym[[1]]$b2b * 100), "%.")
+    },
+    " Pozostali wybrali odpowiedź pośrednią (",
+    round(szk$zad_utrzym[[1]]$ani_ani * 100),
+    "%) lub nie byli w stanie ocenić, na ile są zadowoleni (",
+    round(szk$zad_utrzym[[1]]$trud_pow * 100),
+    "%).",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 4.5}
+if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zad_utrzym[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zad_utrzym_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, t2b, b2b)) %>% 
+    pivot_longer(everything()) %>%   
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Opinie absolwentów dotyczące poziomu zadowolenia ze stabilności pracy zarobkowej"),
+    width = 80)
+  
+  ggplot(tab, aes(x = typ, y = value, fill = name)) +
+    geom_col(width = 0.75, stat = "identity", colour = "white", position = "stack") +
+    geom_text(aes(label = lab), size = 3, position = position_stack(vjust = 0.5)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    ylab(NULL) +
+    xlab(NULL) +
+    theme(legend.position = "bottom",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    guides(fill = guide_legend(reverse = FALSE, nrow = 6, byrow = TRUE)) +
+    scale_fill_brewer(palette = "RdPu")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zad_utrzym[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zad_utrzym_WT[[1]]$n),
+    " absolwentów innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem pewności zatrudnienia / utrzymania pracy”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    sep = ""
+  )
+}
+```
 
 `r ifelse(typDokumentu %in% "pdf", "\\newpage", "")` 
 
