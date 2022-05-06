@@ -1,0 +1,898 @@
+---
+title: |
+  | Raport z internetowego badania uczniów ostatnich klas w roku szkolnym 2020/2021
+subtitle: |
+  | `r get(params$obiektWskazniki)$dane_szk[[1]]$nazwa`
+  | `r get(params$obiektWskazniki)$dane_szk[[1]]$adres`
+output:
+  pdf_document:
+    dev: cairo_pdf
+    fig_caption: no
+    includes:
+      in_header: naglowek2.tex
+    toc: yes
+    toc_depth: 2
+lang: pl
+papersize: a4
+fontsize: 11pt
+geometry: margin=20mm
+params:
+  plikZObiektami: ../../data/wsk_szkola_r3f2.RData
+  obiektWskazniki: szk
+  obiektWskaznikiPorownanie: woj
+  progLiczebnosci: 10
+  typDokumentu: pdf
+  wyrownanieTabWykr: center
+wskazniki:
+  wskazniki: szk
+  wskaznikiGrPor: woj
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(tidyr)
+
+library(MLASZraporty)
+# if (!exists("params")) {
+#   params = list(plikZObiektami = "~/01_IBE/06_Bieżące_2021/17_CAWI_uczen_r3_f1/wskazniki_v2.RData",
+#                 obiektWskazniki = "szk",
+#                 obiektWskaznikiPorownanie = "woj",
+#                 progLiczebnosci = 10,
+#                 typDokumentu = "pdf",
+#                 wyrownanieTabWykr = "center")
+# }
+
+progLiczebnosci = params$progLiczebnosci
+typDokumentu = params$typDokumentu
+wyrownanieTabWykr = params$wyrownanieTabWykr
+
+if (params$plikZObiektami != "") {# to działa przy ręcznym prototypowaniu
+  load(params$plikZObiektami)
+  szk = get(params$obiektWskazniki)
+  woj = get(params$obiektWskaznikiPorownanie)
+} else {# to działa przy wywoływaniu przez generuj_raport()
+  szk = get(params$obiektWskazniki)
+  woj = get(params$obiektWskaznikiPorownanie)
+}
+
+woj = woj %>%
+  filter(ID_RSPO %in% szk$ID_RSPO)
+```
+
+```{r functions, echo=FALSE, message=FALSE, warning=FALSE}
+wyk_num = function() {
+  nr = get0("___nrWykresu___", parent.frame(), ifnotfound = 1)
+  assign("___nrWykresu___", nr + 1, envir = parent.frame())
+  return(nr)
+}
+tab_num = function() {
+  nr = get0("___nrTabeli___", parent.frame(), ifnotfound = 1)
+  assign("___nrTabeli___", nr + 1, envir = parent.frame())
+  return(nr)
+}
+# https://stackoverflow.com/questions/2631780/r-ggplot2-can-i-set-the-plot-title-to-wrap-around-and-shrink-the-text-to-fit-t
+wrapper = function(x, ...) {
+  paste(strwrap(x, ...), collapse = "\n")
+}
+```
+
+`r ifelse(typDokumentu %in% "pdf", "---", "")`
+
+`r ifelse(typDokumentu %in% "pdf", "\\vfill\n\\includegraphics{Belka-Losy-absolwentow-Kolor-PL}", "")`
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
+
+# 1. Wprowadzenie
+
+Szanowni Państwo, 
+
+Przekazujemy kolejny raport z badania ankietowego przeprowadzonego w ramach projektu monitorowania losów absolwentów szkół prowadzących kształcenie w zawodach szkolnictwa branżowego. Mamy nadzieję, że przedstawione wyniki okażą się dla Państwa ciekawe i pomocne w pracy.
+
+1. Informacje o badaniu
+
+    a) Badanie przeprowadzono w ramach projektu konkursowego "Monitorowanie Losów Absolwentów Szkół Zawodowych - II i III runda", realizowanego przez firmy PBS sp. z o.o. i Danae sp. z o.o. Prace związane z przygotowaniem narzędzi badawczych i opracowaniem wyników wykonano w Instytucie Badań Edukacyjnych korzystając ze wsparcia projektu systemowego: "Monitorowanie Losów Absolwentów Szkół Zawodowych - etap II". Oba projekty są współfinansowane z funduszy Unii Europejskiej. Wsparcie pochodzi z Działania 2.15. Kształcenie i szkolenie zawodowe dostosowane do potrzeb zmieniającej się gospodarki II osi priorytetowej pn.: "Efektywna polityka publiczna dla rynku pracy, gospodarki i edukacji" z Programu Operacyjnego Wiedza, Edukacja, Rozwój (PO WER).
+    b) Raport opiera się na wynikach badania internetowego przeprowadzonego w okresie od listopada 2021 roku do lutego 2022 roku. Badanie wśród absolwentów Państwa `r szk$formy[[1]]$typ_szk_dop` realizowała firma `r szk$firma[[1]]`.
+    c) Zaproszenie do wypełnienia ankiety on-line skierowano do `r szk$l_ucz_f1[[1]]` absolwentów, którzy w roku 2020/2021 wzięli udział w badaniu jako uczniowie ostatniej klasy Państwa szkoły. To samo badanie zrealizowano wówczas we wszystkich szkołach kształcących w zawodach szkolnictwa branżowego, o ile ich dyrektorzy wyrazili chęć udziału w badaniu. Raport z tego badania udostępniliśmy Państwu w styczniu 2022 roku, wysyłając link z adresu raporty@losyabsolwentow.pl.
+    d) Ankietę wypełniło `r szk$l_abs[[1]]` absolwentów Państwa szkoły, tj. `r round(szk$l_abs[[1]] / szk$l_ucz_f1[[1]] * 100)`% uczniów, którzy wzięli udział w I fali badania. **Wyników nie należy uogólniać na pozostałych absolwentów Państwa szkoły.**
+
+2) Prezentacja wyników
+
+    a) Wyniki prezentowane w niniejszym raporcie, dotyczące absolwentów Państwa szkoły, zestawiono z odpowiedziami absolwentów innych `r szk$formy[[1]]$typ_szk_dop_mn` z województwa `r szk$formy[[1]]$woj_nazwa_dop` z tego samego rocznika. Pozwala to umieścić wyniki uzyskane w Państwa szkole w szerszym kontekście. Niemniej, biorąc pod uwagę specyfikę poszczególnych szkół oraz zróżnicowany poziom realizacji badania (wzięła w nim udział tylko część absolwentów poproszonych o wypełnienie ankiety), do zaobserwowanych różnic należy podchodzić z dużą ostrożnością.
+    b) Minimalna liczebność grupy respondentów, dla której przedstawiane są poszczególne wyniki w raporcie, wynosi 10 osób. Jeżeli wśród absolwentów szkoły nie udało się uzyskać odpowiedzi na pytanie od minimum 10 respondentów, wynik nie jest prezentowany.
+    c) W celu zachowania czytelności wykresów, etykiety z wartościami poniżej 6% nie są prezentowane.
+    d) Niesumowanie się wartości na niektórych wykresach do 100% lub sumowanie się do wartości innej, niż podana w tekście, wynika z zaokrągleń.
+    e) Ze względu na dużą liczbę raportów (w badaniu wzięli udział absolwenci 1703 szkół), zostały one sporządzone automatycznie.
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
+
+3) Absolwenci, których dotyczy raport
+
+    a) Osoby, które w roku 2020/2021 wzięły udział w badaniu jako uczniowie ostatnich klas `r szk$formy[[1]]$typ_szk_dop_mn`, a następnie jako absolwenci w badaniu realizowanym od listopada 2021 roku.
+    b) Liczba absolwentów Państwa szkoły, których dotyczy raport: `r szk$l_abs[[1]]`, w tym kobiet: `r szk$l_kobiet[[1]]`.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$l_abs[[1]] >= progLiczebnosci) {
+  cat("    c) Zawody i branże, w których kształcili się respondenci w Państwa szkole:\n\n")
+  
+  szk$zaw_licz[[1]] %>% 
+    as_tibble() %>% 
+    select(-n) %>% 
+    arrange(desc(n_zaw)) %>% 
+    kable("latex", booktabs = TRUE, escape = FALSE, longtable = TRUE,
+          linesep = "",
+          col.names = NULL,
+          align = "llc") %>%
+    kable_styling(position = wyrownanieTabWykr,
+          latex_options = c("hold_position", "repeat_header"),
+          repeat_header_text = "(ciąg dalszy tabeli)") %>% 
+    add_header_above(c("Branża", "Zawód" = 1, "Liczba respondentów" = 1),
+                     align = c("l", "l", "c"))
+}
+```
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
+
+# 2. Sytuacja zawodowa absolwentów w okresie lipiec-październik 2021
+
+## 2.1. Praca zarobkowa
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Wśród uczestników badania, którzy zakończyli naukę w Państwa szkole, ",
+    round(szk$praca_zarobkowa[[1]]$ods_ever * 100),
+    "% pracowało zarobkowo przez co najmniej dwa tygodnie w lipcu, sierpniu, wrześniu lub październiku 2021 roku. W przypadku pozostałych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    " co najmniej dwutygodniowy okres pracy w ciągu jednego z tych miesięcy charakteryzował ",
+    round(woj$praca_zarobkowa_WT[[1]]$ods_ever * 100),
+    "% absolwentów.\n\n",
+    "\\textcolor{gray}{Uwzględniono epizody pracy zarobkowej trwające co najmniej dwa tygodnie w danym miesiącu. Do porównań wybrano okres od lipca do października 2021 roku, ponieważ dla tych miesięcy zostały uzyskane informacje o sytuacji zawodowej od wszystkich absolwentów uczestniczących w badaniu (pierwsze ankiety zrealizowano w listopadzie, a respondenci odnosili się do miesięcy poprzedzających miesiąc, w którym wypełniali ankietę).}\n\n",
+    "Na poszczególnych wykresach dane dotyczące absolwentów Państwa szkoły są zestawiane z danymi absolwentów innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ", którzy również zostali objęci badaniem.",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$praca_zarobkowa[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = ods_ever) %>% 
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$praca_zarobkowa_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = ods_ever) %>%  
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+           "Wykres ", wyk_num(),
+           ": Odsetek absolwentów, którzy w okresie od lipca do października 2021 roku mieli epizod pracy zarobkowej"),
+           width = 80)
+  
+  ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$rozklad, 2) < 0.05, -1.3, 0.5)) +
+    ylab(NULL) +
+    xlab(NULL) +
+    coord_flip() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
+  roznice = szk$praca_zarobkowa[[1]][c("ods_07", "ods_08", "ods_09", "ods_10")] %>% 
+    unname() %>% 
+    n_distinct()
+  
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$praca_zarobkowa[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$praca_zarobkowa_WT[[1]]$n),
+    " innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): (...) pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny  / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    "Odsetek absolwentów Państwa szkoły wykonujących pracę zarobkową przez co najmniej dwa tygodnie ",
+    if (roznice %in% 1) {
+      paste0("nie różnił się w zależności od miesiąca.")
+    } else {
+      paste0("różnił się w zależności od miesiąca i wynosił ",
+             round(szk$praca_zarobkowa[[1]]$ods_07 * 100),
+             "% w lipcu, ",
+             round(szk$praca_zarobkowa[[1]]$ods_08 * 100),
+             "% w sierpniu, ",
+             round(szk$praca_zarobkowa[[1]]$ods_09 * 100),
+             "% we wrzeniu i ",
+             round(szk$praca_zarobkowa[[1]]$ods_10 * 100),
+             "% w październiku.")
+    },
+    sep = ""
+  )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$praca_zarobkowa[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, ods_ever)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła",
+           name = c("2021.07", "2021.08", "2021.09", "2021.10"))
+  tab2 = woj$praca_zarobkowa_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, ods_ever)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa",
+           name = c("2021.07", "2021.08", "2021.09", "2021.10"))
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+           "Wykres ", wyk_num(),
+           ": Odsetek absolwentów, którzy w danym miesiącu mieli epizod pracy zarobkowej"),
+           width = 80)
+  
+  wykres = ggplot(tab, aes(x = name, y = value, colour = typ, group = typ)) +
+    geom_point(aes(shape = typ, color = typ), size = 2) +
+    geom_line(aes(linetype = typ, color = typ), size = 1) +
+    ylab(NULL) + 
+    xlab("Miesiąc") +
+    labs(title = tytul,
+         fill = NULL) +
+    scale_y_continuous(labels = scales::percent,
+                       limits = c(0, 1),
+                       breaks = seq(0, 1,by = 0.2)) +
+    theme(legend.title = element_blank(),
+          plot.title = element_text(size = 12),
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_line(color = "lightgray"),
+          plot.title.position = "plot") +
+    geom_rect(xmin = 0.5, xmax = 4.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    scale_shape_manual(values = c(1, 0)) +
+    scale_linetype_manual(values = c(1, 2))
+  
+  print(wykres)
+  
+  cat("Dane z wykresu przedstawiono szczegółowo w poniższej tabeli.\n\n")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-contains(c("typ", "lab"))) %>% 
+    mutate(xx = paste0(round(value.x * 100), "%"),
+           yy = paste0(round(value.y * 100), "%")) %>% 
+    select(-contains("value")) %>% 
+    kable("latex", booktabs = TRUE,
+          col.names = NULL, linesep = "",
+          align = "lcc") %>%
+    kable_styling(position = wyrownanieTabWykr,
+                  latex_options = "hold_position") %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły z województwa" = 1)) 
+}
+```
+
+## 2.2. Bezrobocie rejestrowane
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
+  cat(
+    "W okresie od lipca do października 2021 roku ",
+    round(szk$bezrobocie[[1]]$ods_ever * 100),
+    "% absolwentów Państwa szkoły uczestniczących w badaniu zarejestrowało się w urzędzie pracy jako osoby bezrobotne. Spośród absolwentów pozostałych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    " co najmniej dwutygodniowy okres zarejestrowanego bezrobocia w lipcu, sierpniu, wrześniu lub październiku 2021 roku odnotowano",
+    if (szk$bezrobocie[[1]]$ods_ever == woj$bezrobocie_WT[[1]]$ods_ever) {paste0(" również")},
+    " w przypadku ",
+    round(woj$bezrobocie_WT[[1]]$ods_ever * 100),
+    "%.\n\n\\textcolor{gray}{Uwzględniono epizody zarejestrowanego bezrobocia trwające co najmniej dwa tygodnie w danym miesiącu.}",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$bezrobocie[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = ods_ever) %>% 
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$bezrobocie_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = ods_ever) %>%  
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Odsetek absolwentów, którzy w okresie od lipca do października 2021 roku mieli epizod bezrobocia rejestrowanego"),
+    width = 80)
+  
+  ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$rozklad, 2) < 0.05, -1.3, 0.5)) +
+    ylab(NULL) +
+    xlab(NULL) +
+    coord_flip() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
+  roznice = szk$bezrobocie[[1]][c("ods_07", "ods_08", "ods_09", "ods_10")] %>% 
+    unname() %>% 
+    n_distinct()
+  
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$bezrobocie[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$bezrobocie_WT[[1]]$n),
+    " innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): (...) był(a) Pan(i) zarejestrowany(a) w urzędzie pracy jako osoba bezrobotna?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    if (roznice %in% 1) {
+      paste0("W ciągu każdego z czterech rozpatrywanych miesięcy osoby zarejestrowane jako bezrobotne stanowiły ",
+             round(szk$bezrobocie[[1]]$ods_07 * 100),
+             "% absolwentów Państwa szkoły.")
+    } else {
+      paste0("W lipcu osoby zarejestrowane jako bezrobotne stanowiły ",
+             round(szk$bezrobocie[[1]]$ods_07 * 100),
+             "% absolwentów Państwa szkoły, w sierpniu ",
+             round(szk$bezrobocie[[1]]$ods_08 * 100),
+             "%, we wrześniu ",
+             round(szk$bezrobocie[[1]]$ods_09 * 100),
+             "% i ",
+             round(szk$bezrobocie[[1]]$ods_10 * 100),
+             "% w październiku.")
+    },
+    sep = ""
+  )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$bezrobocie[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, ods_ever)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła",
+           name = c("2021.07", "2021.08", "2021.09", "2021.10"))
+  tab2 = woj$bezrobocie_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, ods_ever)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa",
+           name = c("2021.07", "2021.08", "2021.09", "2021.10"))
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+           "Wykres ", wyk_num(),
+           ": Odsetek absolwentów, którzy w danym miesiącu mieli epizod bezrobocia rejestrowanego"),
+           width = 80)
+  
+  wykres = ggplot(tab, aes(x = name, y = value, colour = typ, group = typ)) +
+    geom_point(aes(shape = typ, color = typ), size = 2) +
+    geom_line(aes(linetype = typ, color = typ), size = 1) +
+    ylab(NULL) + 
+    xlab("Miesiąc") +
+    labs(title = tytul,
+         fill = NULL) +
+    scale_y_continuous(labels = scales::percent,
+                       limits = c(0, 1),
+                       breaks = seq(0, 1,by = 0.2)) +
+    theme(legend.title = element_blank(),
+          plot.title = element_text(size = 12),
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_line(color = "lightgray"),
+          plot.title.position = "plot") +
+    geom_rect(xmin = 0.5, xmax = 4.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    scale_shape_manual(values = c(1, 0)) +
+    scale_linetype_manual(values = c(1, 2))
+  
+  print(wykres)
+  
+  cat("Dane z wykresu przedstawiono szczegółowo w poniższej tabeli.\n\n")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-contains(c("typ", "lab"))) %>% 
+    mutate(xx = paste0(round(value.x * 100), "%"),
+           yy = paste0(round(value.y * 100), "%")) %>% 
+    select(-contains("value")) %>% 
+    kable("latex", booktabs = TRUE,
+          col.names = NULL, linesep = "",
+          align = "lcc") %>%
+    kable_styling(position = wyrownanieTabWykr,
+                  latex_options = "hold_position") %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły z województwa" = 1)) 
+}
+```
+
+## 2.3. Bierność edukacyjna i zawodowa (NEET)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$neet[[1]]$n_neet >= progLiczebnosci) {
+  cat(
+    if (szk$neet[[1]]$ods_ever %in% 0) {
+      paste0("Wśród uczestniczących w badaniu absolwentów Państwa szkoły żaden nie był bierny edukacyjnie i zawodowo przez cały okres od lipca do października 2021 roku.")
+    } else {
+      paste0("Wśród uczestniczących w badaniu absolwentów Państwa szkoły ",
+             round(szk$neet[[1]]$ods_ever * 100),
+             "% pozostawało biernych przez cały okres od lipca do października 2021 roku. Do tej grupy mogły należeć m.in. osoby, które podjęły dalszą naukę od października - informacje na ten temat przedstawiamy  w kolejnym rozdziale.")
+    },
+    "\n\n\textcolor{gray}{Bierność edukacyjna i zawodowa jest tutaj rozumiana jako brak w danym miesiącu co najmniej dwutygodniowego epizodu naukilub wykonywania pracy zarobkowej. Bierność edukacyjna i zawodowa jest tożsama pojęciu NEET (ang. Neither in Employment nor in Education and Training).}",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$neet[[1]]$n_neet >= progLiczebnosci) {
+  tab1 = szk$neet[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = ods_ever) %>% 
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$neet_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = ods_ever) %>%  
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": dsetek absolwentów, którzy w okresie od lipca do października 2021 roku pozostawali bierni edukacyjnie i zawodowo"),
+    width = 80)
+  
+  ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$rozklad, 2) < 0.05, -1.3, 0.5)) +
+    ylab(NULL) +
+    xlab(NULL) +
+    coord_flip() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$neet[[1]]$n_neet >= progLiczebnosci) {
+  miesiace = szk$bezrobocie[[1]][c("ods_07", "ods_08", "ods_09", "ods_10")] %>%
+    as_tibble() %>%
+    pivot_longer(everything()) %>%
+    mutate(name = c("w lipcu", "w sierpniu", "we wrześniu", "w październiku"))
+  
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$neet[[1]]$n_neet,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$neet_WT[[1]]$n_neet),
+    " innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytania “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): studiował(a) P. lub uczył(a) się P. w szkole / pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny . zarobkowo / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego pytania i miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    if (nrow(filter(miesiace["value"], value %in% max(value))) %in% 1) {
+      cat(
+        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najwyższy ",
+        miesiace$name[miesiace$value %in% max(miesiace$value)],
+        " - wynosił wówczas ",
+        round(max(miesiace$value) * 100),
+        "%.\n\n",
+        sep = ""
+      )
+    },
+    if (nrow(filter(miesiace["value"], value %in% min(value))) %in% 1) {
+      cat(
+        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najniższy ",
+        miesiace$name[miesiace$value %in% min(miesiace$value)],
+        " - wynosił wówczas ",
+        round(min(miesiace$value) * 100),
+        "%.\n\n",
+        sep = ""
+      )
+    },
+    if (nrow(filter(miesiace["value"], value %in% max(value))) > 1) {
+      cat(
+        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najwyższy ",
+        paste(miesiace$name[miesiace$value %in% max(miesiace$value)], collapse = ", "),
+        " - wynosił wówczas ",
+        round(max(miesiace$value) * 100),
+        "%.\n\n",
+        sep = ""
+      )
+    },
+    if (nrow(filter(miesiace["value"], value %in% min(value))) > 1) {
+      cat(
+        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najniższy ",
+        paste(miesiace$name[miesiace$value %in% min(miesiace$value)], collapse = ", "),
+        " - wynosił wówczas ",
+        round(min(miesiace$value) * 100),
+        "%.\n\n",
+        sep = ""
+      )
+    },
+    if (nrow(filter(miesiace["value"], value %in% min(value))) %in% 4) {
+      cat(
+        "Odsetek biernych zawodowo absolwentów Państwa szkoły nie różnił się w zależności od miesiąca.\n\n",
+        sep = ""
+      )
+    },
+    sep = ""
+  )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$neet[[1]]$n_neet >= progLiczebnosci) {
+  tab1 = szk$neet[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, ods_ever, n_neet)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła",
+           name = c("2021.07", "2021.08", "2021.09", "2021.10"))
+  tab2 = woj$neet_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, ods_ever, n_neet)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa",
+           name = c("2021.07", "2021.08", "2021.09", "2021.10"))
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+           "Wykres ", wyk_num(),
+           ": Odsetek absolwentów, którzy w danym miesiącu pozostawali bierni edukacyjnie i zawodowo"),
+           width = 80)
+  
+  wykres = ggplot(tab, aes(x = name, y = value, colour = typ, group = typ)) +
+    geom_point(aes(shape = typ, color = typ), size = 2) +
+    geom_line(aes(linetype = typ, color = typ), size = 1) +
+    ylab(NULL) + 
+    xlab("Miesiąc") +
+    labs(title = tytul,
+         fill = NULL) +
+    scale_y_continuous(labels = scales::percent,
+                       limits = c(0, 1),
+                       breaks = seq(0, 1,by = 0.2)) +
+    theme(legend.title = element_blank(),
+          plot.title = element_text(size = 12),
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_line(color = "lightgray"),
+          plot.title.position = "plot") +
+    geom_rect(xmin = 0.5, xmax = 4.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    scale_shape_manual(values = c(1, 0)) +
+    scale_linetype_manual(values = c(1, 2))
+  
+  print(wykres)
+  
+  cat("Dane z wykresu przedstawiono szczegółowo w poniższej tabeli.\n\n")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-contains(c("typ", "lab"))) %>% 
+    mutate(xx = paste0(round(value.x * 100), "%"),
+           yy = paste0(round(value.y * 100), "%")) %>% 
+    select(-contains("value")) %>% 
+    kable("latex", booktabs = TRUE,
+          col.names = NULL, linesep = "",
+          align = "lcc") %>%
+    kable_styling(position = wyrownanieTabWykr,
+                  latex_options = "hold_position") %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły z województwa" = 1)) 
+}
+```
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
+
+# 3. Sytuacja edukacyjno-zawodowa absolwentów w październiku 2021
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
+  cat(
+    "W październiku 2021 roku ",
+    round(szk$status_2021_10[[1]]$nauka_praca * 100),
+    "% objętych badaniem absolwentów Państwa szkoły, poświęciło po co najmniej dwa tygodnie zarówno na pracę zarobkową, jak i na naukę w szkole lub na studiach. Z kolei ",
+    round(szk$status_2021_10[[1]]$tylko_praca * 100),
+    "% pracowało zarobkowo nie kontynuując nauki w tych formach, a ",
+    round(szk$status_2021_10[[1]]$tylko_nauka * 100),
+    "% uczestniczyło w edukacji, ale nie pracowało. Ani dwutygodniowego okresu pracy zarobkowej, ani takiego okresu nauki, nie miało w październiku ",
+    round(szk$status_2021_10[[1]]$brak_nauka_brak_praca * 100),
+    "%.\n\n\textcolor{gray}{Dla absolwentów wszystkich szkół rozpatrywano sytuację w październiku 20210 roku, żeby uwzględnić ewentualne rozpoczynanie nauki na studiach po ukończeniu szkół techników i szkół policealnych.}",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$status_2021_10[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, nie_dotyczy_liczba)) %>% 
+    pivot_longer(everything()) %>% 
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Państwa szkoła") %>% 
+    mutate(name = c("Tylko praca",
+                    "Tylko nauka",
+                    "Nauka i praca",
+                    "Brak nauki i brak pracy"))
+  
+  tab2 = woj$status_2021_10_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(-c(n, nie_dotyczy_liczba)) %>% 
+    pivot_longer(everything()) %>%   
+    mutate(lab = paste0(round(value * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa") %>% 
+    mutate(name = c("Tylko praca",
+                    "Tylko nauka",
+                    "Nauka i praca",
+                    "Brak nauki i brak pracy"))
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Sytuacja edukacyjno-zawodowa absolwentów w październiku 2021 roku"),
+    width = 80)
+  
+  ggplot(tab, aes(x = typ, y = value, fill = name)) +
+    geom_col(width = 0.75, stat = "identity", colour = "white", position = "dodge2") +
+    geom_text(aes(label = lab), size = 3, position = position_dodge2(0.75)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    ylab(NULL) +
+    xlab(NULL) +
+    # coord_flip() +
+    theme(legend.position = "right",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
+    guides(fill = guide_legend(reverse = FALSE, nrow = 4, byrow = TRUE)) +
+    scale_fill_brewer(palette = "RdPu")
+}
+```
+
+**UZUPEŁNIĆ TU JAK TOMEK WPROWADZI POPRAWKI**
+
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
+
+# 4. Ścieżki kontynuowania edukacji
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
+
+# 5. Praca zawodowa
+
+## 5.1. Zgodność pracy z wykształceniem
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
+  cat(
+    "Wykonywanie pracy w zawodzie, którego uczyli się w Państwa szkole, przez co najmniej dwa tygodnie w okresie od lipca 2021 roku do momentu wypełnienia ankiety, zadeklarowało ",
+    round(szk$zgodnosc_pracy[[1]]$wyucz * 100),
+    "% jej absolwentów.",
+    sep = ""
+  )
+} else {
+  cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zgodnosc_pracy[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = wyucz) %>% 
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zgodnosc_pracy_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = wyucz) %>%  
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Odsetek absolwentów, którzy podjęli pracę zarobkową w wyuczonym zawodzie"),
+    width = 80)
+  
+  ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$rozklad, 2) < 0.05, -1.3, 0.5)) +
+    ylab(NULL) +
+    xlab(NULL) +
+    coord_flip() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot",
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zgodnosc_pracy[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zgodnosc_pracy_WT[[1]]$n),
+    " innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Czy od czasu ukończenia [typ szkoły, w której uczył się respondent], czyli od lipca 2021 roku w sumie przez co najmniej dwa tygodnie wykonywał(a) Pan(i) pracę zarobkową w: zawodzie [zawód, w którym kształcił się respondent]? (...)”. Respondenci wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    "Natomiast ",
+    round(szk$zgodnosc_pracy[[1]]$branza * 100),
+    "% stwierdziło, że w tym okresie wprawdzie nie pracowali w wyuczonym zawodzie, ale pracowali w branży, do której ten zawód należy.",
+    sep = ""
+  )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
+  tab1 = szk$zgodnosc_pracy[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = branza) %>% 
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Państwa szkoła")
+  
+  tab2 = woj$zgodnosc_pracy_WT[[1]] %>% 
+    as_tibble() %>% 
+    select(rozklad = branza) %>%  
+    mutate(lab = paste0(round(rozklad * 100), "%"),
+           typ = "Pozostałe szkoły\nz województwa")
+  
+  tab = rbind(tab1, tab2)
+  
+  tytul = wrapper(paste0(
+    "Wykres ", wyk_num(),
+    ": Odsetek absolwentów, którzy nie podjęli pracy w wyuczonym zawodzie, ale podjęli ją w branży do której należy ten zawód"),
+    width = 80)
+  
+  ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    labs(fill = NULL,
+         title = tytul) +
+    geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$rozklad, 2) < 0.05, -1.3, 0.5)) +
+    ylab(NULL) +
+    xlab(NULL) +
+    coord_flip() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title.position = "plot",
+          plot.title = element_text(size = 12)) +
+    geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
+  cat(
+    "*Wykres przedstawia odpowiedzi ",
+    szk$zgodnosc_pracy[[1]]$n,
+    " absolwentów Państwa szkoły oraz ",
+    round(woj$zgodnosc_pracy_WT[[1]]$n),
+    " innych ",
+    szk$formy[[1]]$typ_szk_dop_mn,
+    " z województwa ",
+    szk$formy[[1]]$woj_nazwa_dop,
+    ". Respondentom zadano pytanie “Czy od czasu ukończenia [typ szkoły, w której uczył się respondent] w okresie, czyli od lipca 2021 roku do [miesiąc poprzedzający miesiąc, w którym respondent wypełnia ankietę] 2020 roku w sumie przez co najmniej dwa tygodnie wykonywał(a) Pan(i) pracę zarobkową w: zawodzie [zawód, w którym kształcił się respondent]?; innym zawodzie, ale w branży [branża, w której kształcił się respondent]. Respondenci wskazywali odpowiedź “Tak” lub “Nie”. Na wykresie uwzględniono respondentów, którzy odpowiedzieli przecząco na pytanie dotyczące zawodu ale twierdząco na pytanie dotyczące branży.*",
+    sep = ""
+  )
+}
+```
+
+## 5.2. Zadowolenie z pracy
+
+### Ogólne zadowolenie z pracy
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+
+```
+
+### Możliwości rozwoju zawodowego
+
+### Możliwości godzenia pracy z życiem poza pracą
+
+### Satysfakcja z poziom zarobków
+
+### Pewność utrzymania pracy
+
+`r ifelse(typDokumentu %in% "pdf", "\\newpage", "")` 
+
+`r ifelse(typDokumentu %in% "pdf", "---", "")`
+
+Więcej informacji o wynikach badania znajdą Państwo na stronie:
+
+<https://losyabsolwentow.ibe.edu.pl/>
+
+
+
+
