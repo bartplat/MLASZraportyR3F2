@@ -31,7 +31,7 @@ library(ggplot2)
 library(kableExtra)
 library(tidyr)
 
-# library(MLASZraportyR3F2)
+library(MLASZraportyR3F2)
 # if (!exists("params")) {
 #   params = list(plikZObiektami = "~/01_IBE/07_Biezace_2022/16_wskazniki_cawi_r3f2/data/wskazniki/wsk_minimal_beta.RData",
 #                 obiektWskazniki = "szk",
@@ -89,24 +89,24 @@ przekazujemy kolejny raport z badania ankietowego przeprowadzonego w ramach proj
 
 1. Informacje o badaniu
 
-    a) Badanie przeprowadzono w ramach projektu konkursowego "Monitorowanie Losów Absolwentów Szkół Zawodowych - II i III runda", realizowanego przez firmy PBS sp. z o.o. i Danae sp. z o.o. Prace związane z przygotowaniem narzędzi badawczych i opracowaniem wyników wykonano w Instytucie Badań Edukacyjnych korzystając ze wsparcia projektu systemowego "Monitorowanie Losów Absolwentów Szkół Zawodowych - etap II". Oba projekty są współfinansowane z funduszy Unii Europejskiej. Wsparcie pochodzi z Działania 2.15. "Kształcenie i szkolenie zawodowe dostosowane do potrzeb zmieniającej się gospodarki" II osi priorytetowej pn.: "Efektywna polityka publiczna dla rynku pracy, gospodarki i edukacji" z Programu Operacyjnego Wiedza, Edukacja, Rozwój (PO WER).
-    b) Raport opiera się na wynikach badania internetowego przeprowadzonego w okresie od listopada 2021 roku do lutego 2022 roku. Badanie wśród absolwentów Państwa `r case_when(szk$TYP_SZK[[1]] %in% 1 ~ "szkoły branżowej pierwszego stopnia", szk$TYP_SZK[[1]] %in% 2 ~ "technikum", szk$TYP_SZK[[1]] %in% 3 ~ "szkoły policealnej")` realizowała firma `r szk$firma[[1]]`.
-    c) Zaproszenie do wypełnienia ankiety on-line skierowano do `r szk$l_ucz_f1[[1]]` absolwentów, którzy w roku 2020/2021 wzięli udział w badaniu jako uczniowie ostatniej klasy Państwa szkoły. To samo badanie zrealizowano wówczas we wszystkich szkołach kształcących w zawodach szkolnictwa branżowego, o ile ich dyrektorzy wyrazili chęć udziału w badaniu.
+    a) Badanie przeprowadzono w ramach projektu konkursowego "Monitorowanie Losów Absolwentów Szkół Zawodowych - II i III runda", realizowanego przez firmy PBS sp. z o.o. i Danae sp. z o.o. Prace związane z przygotowaniem narzędzi badawczych i opracowaniem wyników wykonano w Instytucie Badań Edukacyjnych korzystając ze wsparcia projektu systemowego "Monitorowanie Losów Absolwentów Szkół Zawodowych - etap II". Oba projekty są współfinansowane z funduszy Unii Europejskiej. Wsparcie pochodzi z Działania 2.15. "Kształcenie i szkolenie zawodowe dostosowane do potrzeb zmieniającej się gospodarki" II osi priorytetowej pn.: "Efektywna polityka publiczna dla rynku pracy, gospodarki i edukacji" Programu Operacyjnego Wiedza, Edukacja, Rozwój (PO WER).
+    b) Raport opiera się na wynikach badania internetowego przeprowadzonego w okresie od listopada 2021 roku do lutego 2022 roku. Badanie wśród absolwentów Państwa `r case_when(szk$TYP_SZK[[1]] %in% 1 ~ "branżowej szkoły pierwszego stopnia", szk$TYP_SZK[[1]] %in% 2 ~ "technikum", szk$TYP_SZK[[1]] %in% 3 ~ "szkoły policealnej")` realizowała firma `r szk$firma[[1]]`.
+    c) Zaproszenie do wypełnienia ankiety on-line skierowano do `r szk$l_ucz_f1[[1]]` absolwentów, którzy w roku szkolnym 2020/2021 wzięli udział w I fali badania jako uczniowie ostatniej klasy Państwa szkoły. To samo badanie zrealizowano wówczas we wszystkich szkołach kształcących w zawodach szkolnictwa branżowego, o ile ich dyrektorzy wyrazili chęć udziału w badaniu.
         
-        Raport z tego badania udostępniliśmy Państwu w styczniu 2022 roku, wysyłając link z adresu raporty@losyabsolwentow.pl.
-    d) Ankietę wypełniło `r szk$l_abs[[1]]` absolwentów Państwa szkoły, tj. `r round(szk$l_abs[[1]] / szk$l_ucz_f1[[1]] * 100)`% uczniów, którzy wzięli udział w I fali badania. **Wyników nie należy uogólniać na pozostałych absolwentów Państwa szkoły.**
+        Raporty z tego badania udostępniliśmy poszczególnym szkołom w styczniu i lutym 2022 roku, wysyłając link z adresu raporty@losyabsolwentow.pl.
+    d) Ankietę, której wyniki przedstawiamy w niniejszym raporcie, wypełniło `r szk$l_abs[[1]]` absolwentów Państwa szkoły, tj. `r round(szk$l_abs[[1]] / szk$l_ucz_f1[[1]] * 100)`% uczniów, którzy wzięli udział w I fali badania. **Wyników nie należy uogólniać na pozostałych absolwentów Państwa szkoły.**
 
 2) Prezentacja wyników
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$l_abs >= progLiczebnosci) {
   cat(
-    "    a) Wyniki prezentowane w niniejszym raporcie, dotyczące absolwentów Państwa szkoły, zestawiono z odpowiedziami absolwentów innych ",
+    "    a) Wyniki dotyczące absolwentów Państwa szkoły zestawiono z odpowiedziami absolwentów innych ",
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
     " z tego samego rocznika. Pozwala to umieścić wyniki uzyskane w Państwa szkole w szerszym kontekście. Niemniej, biorąc pod uwagę specyfikę poszczególnych szkół oraz zróżnicowany poziom realizacji badania (wzięła w nim udział tylko część absolwentów poproszonych o wypełnienie ankiety), do zaobserwowanych różnic należy podchodzić z dużą ostrożnością.\n",
-    "    b) Minimalna liczebność grupy respondentów, dla której przedstawiane są poszczególne wyniki w raporcie, wynosi 10 osób. Jeżeli wśród absolwentów szkoły nie udało się uzyskać odpowiedzi na pytanie od minimum 10 respondentów, wynik nie jest prezentowany.\n",
+    "    b) Minimalna liczebność grupy absolwentów Państwa szkoły, dla której przedstawiane są poszczególne wyniki w raporcie, wynosi 10 osób. Jeżeli wśród absolwentów szkoły nie udało się uzyskać odpowiedzi na pytanie od minimum 10 respondentów, wynik nie jest prezentowany.\n",
     "    c) W celu zachowania czytelności wykresów, etykiety z wartościami poniżej 6% nie są prezentowane.\n",
     "    d) Niesumowanie się wartości na niektórych wykresach do 100% lub sumowanie się do wartości innej, niż podana w tekście, wynika z zaokrągleń.\n",
     "    e) Ze względu na dużą liczbę raportów (w badaniu wzięli udział absolwenci 1703 szkół), zostały one sporządzone automatycznie.",
@@ -125,12 +125,14 @@ if (szk$l_abs >= progLiczebnosci) {
 
 3) Absolwenci, których dotyczy raport
 
-    a) Osoby, które w roku 2020/2021 wzięły udział w badaniu jako uczniowie ostatnich klas `r szk$formy[[1]]$typ_szk_dop_mn`, a następnie jako absolwenci w badaniu realizowanym od listopada 2021 roku.
+    a) Osoby, które w roku 2020/2021 wzięły udział w badaniu jako uczniowie ostatnich klas `r szk$formy[[1]]$typ_szk_dop_mn`, a następnie jako absolwenci w badaniu realizowanym od listopada 2021 roku do lutego 2022 roku.
     b) Liczba absolwentów Państwa szkoły, których dotyczy raport: `r szk$l_abs[[1]]`, w tym kobiet: `r szk$l_kobiet[[1]]`.
-    c) Zawody i branże, w których kształcili się respondenci w Państwa szkole:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
-szk$zaw_licz[[1]] %>% 
+if (szk$zaw_licz[[1]]$n > 0) {
+  cat("    c) Zawody i branże, w których kształcili się respondenci w Państwa szkole:")
+  
+  szk$zaw_licz[[1]] %>% 
   as_tibble() %>% 
   select(-n) %>% 
   arrange(desc(n_zaw)) %>% 
@@ -143,6 +145,7 @@ szk$zaw_licz[[1]] %>%
                 repeat_header_text = "(ciąg dalszy tabeli)") %>% 
   add_header_above(c("Branża", "Zawód" = 1, "Liczba\nrespondentów" = 1),
                    align = c("l", "l", "c"))
+}
 ```
 
 `r ifelse(typDokumentu %in% "pdf", "\\newpage", "")`
@@ -164,7 +167,7 @@ if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
     round(woj$praca_zarobkowa_WT[[1]]$ods_ever * 100),
     "% absolwentów.\n\n",
     "\\textcolor{gray}{Uwzględniono epizody pracy zarobkowej trwające co najmniej dwa tygodnie w danym miesiącu. Do porównań wybrano okres od lipca do października 2021 roku, ponieważ dla tych miesięcy zostały uzyskane informacje o sytuacji zawodowej od wszystkich absolwentów uczestniczących w badaniu (pierwsze ankiety zrealizowano w listopadzie, a respondenci odnosili się do miesięcy poprzedzających miesiąc, w którym wypełniali ankietę).}\n\n",
-    "Na poszczególnych wykresach dane dotyczące absolwentów Państwa szkoły są zestawiane z danymi absolwentów innych ",
+    "Na poszczególnych wykresach dane dotyczące absolwentów Państwa szkoły są zestawiane z danymi dotyczącymi absolwentów innych ",
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
@@ -198,7 +201,7 @@ if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
            width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
-    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
     scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
     labs(fill = NULL,
          title = tytul) +
@@ -223,7 +226,7 @@ if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
     n_distinct()
   
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$praca_zarobkowa[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$praca_zarobkowa_WT[[1]]$n),
@@ -231,7 +234,7 @@ if (szk$praca_zarobkowa[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): (...) pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    ". Respondentom zadano pytanie “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): (...) pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.}*\n\n",
     "Odsetek absolwentów Państwa szkoły wykonujących pracę zarobkową przez co najmniej dwa tygodnie ",
     if (roznice %in% 1) {
       paste0("nie różnił się w zależności od miesiąca.")
@@ -357,8 +360,8 @@ if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
     ": Odsetek absolwentów, którzy w okresie od lipca do października 2021 roku mieli epizod bezrobocia rejestrowanego"),
     width = 80)
   
-  ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
-    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+  wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
     scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
     labs(fill = NULL,
          title = tytul) +
@@ -373,6 +376,8 @@ if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
           plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+  
+  print(wykres)
 }
 ```
 
@@ -383,15 +388,15 @@ if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
     n_distinct()
   
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$bezrobocie[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$bezrobocie_WT[[1]]$n),
-    " absolwenci innych ",
+    " absolwentów innych ",
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): (...) był(a) Pan(i) zarejestrowany(a) w urzędzie pracy jako osoba bezrobotna?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    ". Respondentom zadano pytanie “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): (...) był(a) Pan(i) zarejestrowany(a) w urzędzie pracy jako osoba bezrobotna?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.}*\n\n",
     if (roznice %in% 1) {
       paste0("W ciągu każdego z czterech rozpatrywanych miesięcy osoby zarejestrowane jako bezrobotne stanowiły ",
              round(szk$bezrobocie[[1]]$ods_07 * 100),
@@ -474,7 +479,7 @@ if (szk$bezrobocie[[1]]$n >= progLiczebnosci) {
 }
 ```
 
-## 2.3. Bierność edukacyjna i zawodowa (NEET)
+## 2.3. Bierność edukacyjna i zawodowa
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$neet[[1]]$n >= progLiczebnosci) {
@@ -486,7 +491,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci) {
              round(szk$neet[[1]]$ods_all * 100),
              "% pozostawało biernych przez cały okres od lipca do października 2021 roku.")
     },
-    "\n\n\\textcolor{gray}{Bierność edukacyjna i zawodowa jest tutaj rozumiana jako brak w danym miesiącu co najmniej dwutygodniowego epizodu nauki, wykonywania pracy zarobkowej oraz zarejestrowanego bezrobocia. Bierność edukacyjna i zawodowa jest tożsama pojęciu NEET (ang. Neither in Employment nor in Education and Training).}",
+    "\n\n\\textcolor{gray}{Bierność edukacyjna i zawodowa jest tutaj rozumiana jako brak w danym miesiącu co najmniej dwutygodniowego epizodu nauki, wykonywania pracy zarobkowej oraz zarejestrowanego bezrobocia.}",
     sep = ""
   )
 } else {
@@ -516,7 +521,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci & szk$neet[[1]]$ods_all > 0) {
     width = 80)
   
   wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
-    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
     scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
     labs(fill = NULL,
          title = tytul) +
@@ -531,10 +536,11 @@ if (szk$neet[[1]]$n >= progLiczebnosci & szk$neet[[1]]$ods_all > 0) {
           plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+  
   print(wykres)
   
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$neet[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$neet_WT[[1]]$n),
@@ -542,7 +548,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci & szk$neet[[1]]$ods_all > 0) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytania “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): studiował(a) P. lub uczył(a) się P. w szkole / pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy / był(a) Pan(i) zarejestrowany(a) w urzędzie pracy jako osoba bezrobotna?”. Respondenci, w odniesieniu do każdego pytania i miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    ". Respondentom zadano pytania “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): studiował(a) P. lub uczył(a) się P. w szkole / pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy / był(a) Pan(i) zarejestrowany(a) w urzędzie pracy jako osoba bezrobotna?”. Respondenci, w odniesieniu do każdego pytania i miesiąca, wskazywali odpowiedź “Tak” lub “Nie”.}*\n\n",
     sep = ""
   )
 }
@@ -558,7 +564,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci) {
   cat(
     if (nrow(filter(miesiace["value"], value %in% max(value))) %in% 1) {
       cat(
-        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najwyższy ",
+        "Odsetek biernych edukacyjnie i zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najwyższy ",
         miesiace$name[miesiace$value %in% max(miesiace$value)],
         " - wynosił wówczas ",
         round(max(miesiace$value) * 100),
@@ -568,7 +574,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci) {
     },
     if (nrow(filter(miesiace["value"], value %in% min(value))) %in% 1) {
       cat(
-        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najniższy ",
+        "Odsetek biernych edukacyjnie i zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najniższy ",
         miesiace$name[miesiace$value %in% min(miesiace$value)],
         " - wynosił wówczas ",
         round(min(miesiace$value) * 100),
@@ -578,7 +584,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci) {
     },
     if (nrow(filter(miesiace["value"], value %in% max(value))) > 1) {
       cat(
-        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najwyższy ",
+        "Odsetek biernych edukacyjnie i zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najwyższy ",
         paste(miesiace$name[miesiace$value %in% max(miesiace$value)], collapse = ", "),
         " - wynosił wówczas ",
         round(max(miesiace$value) * 100),
@@ -588,7 +594,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci) {
     },
     if (nrow(filter(miesiace["value"], value %in% min(value))) > 1) {
       cat(
-        "Odsetek biernych zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najniższy ",
+        "Odsetek biernych edukacyjnie i zawodowo absolwentów Państwa szkoły w ciągu rozpatrywanego okresu był najniższy ",
         paste(miesiace$name[miesiace$value %in% min(miesiace$value)], collapse = ", "),
         " - wynosił wówczas ",
         round(min(miesiace$value) * 100),
@@ -598,7 +604,7 @@ if (szk$neet[[1]]$n >= progLiczebnosci) {
     },
     if (nrow(filter(miesiace["value"], value %in% min(value))) %in% 4) {
       cat(
-        "Odsetek biernych zawodowo absolwentów Państwa szkoły nie różnił się w zależności od miesiąca.\n\n",
+        "Odsetek biernych edukacyjnie i zawodowo absolwentów Państwa szkoły nie różnił się w zależności od miesiąca.\n\n",
         sep = ""
       )
     },
@@ -678,9 +684,13 @@ if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
   cat(
     "W październiku 2021 roku ",
     round(szk$status_2021_10[[1]]$nauka_praca * 100),
-    "% objętych badaniem absolwentów Państwa szkoły, poświęciło po co najmniej dwa tygodnie zarówno na pracę zarobkową, jak i na naukę w szkole lub na studiach. Z kolei ",
+    "% objętych badaniem absolwentów Państwa szkoły, poświęciło po co najmniej dwa tygodnie zarówno na pracę zarobkową, jak i na naukę ",
+    ifelse(szk$TYP_SZK[[1]] %in% 1,
+           paste0("w kolejnej szkole"),
+           paste0("w szkole lub na studiach")),
+    ". Z kolei ",
     round(szk$status_2021_10[[1]]$tylko_praca * 100),
-    "% pracowało zarobkowo nie kontynuując nauki w tych formach, a ",
+    "% pracowało zarobkowo nie kontynuując nauki, a ",
     round(szk$status_2021_10[[1]]$tylko_nauka * 100),
     "% uczestniczyło w edukacji, ale nie pracowało. Ani dwutygodniowego okresu pracy zarobkowej, ani takiego okresu nauki, nie miało w październiku ",
     round(szk$status_2021_10[[1]]$brak_nauka_brak_praca * 100),
@@ -749,7 +759,7 @@ if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
     guides(fill = guide_legend(reverse = TRUE, nrow = 4, byrow = TRUE)) +
-    scale_fill_brewer(palette = "RdPu")
+    scale_fill_brewer(palette = "PiYG")
 }
 ```
 
@@ -769,7 +779,7 @@ if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
     add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły z województwa" = 1))
   
   cat(
-    "*Wykres przedstawia rozkład zmiennej utworzonej na podstawie pytań: “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): studiował(a) P. lub uczył(a) się P. w szkole / pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”. Wykres uwzględnia odpowiedzi dotyczące października, udzielone przez ",
+    "*\\textcolor{gray}{Wykres przedstawia rozkład zmiennej utworzonej na podstawie pytań: “Proszę spojrzeć na poniższy kalendarz i zaznaczyć miesiące, w których w sumie przez co najmniej dwa tygodnie (bez względu na liczbę godzin w tygodniu): studiował(a) P. lub uczył(a) się P. w szkole / pracował(a) P. we własnym gospodarstwie rolnym lub w gospodarstwie P. rodziny / pracował(a) P. zarobkowo u pracodawcy (na dowolnych zasadach) / pracował(a) P. na własny rachunek, czyli nie u pracodawcy?”. Respondenci, w odniesieniu do każdego miesiąca, wskazywali odpowiedź “Tak” lub “Nie”. Wykres uwzględnia odpowiedzi dotyczące października, udzielone przez ",
     szk$status_2021_10[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$status_2021_10_WT[[1]]$n),
@@ -777,7 +787,7 @@ if (szk$status_2021_10[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ".*\n\nDane z wykresu przedstawiono szczegółowo w poniższej tabeli.\n\n",
+    ".}*\n\nDane z wykresu przedstawiono szczegółowo w poniższej tabeli.\n\n",
     tabela, 
     sep = ""
   )
@@ -795,13 +805,13 @@ if (szk$TYP_SZK[[1]] %in% 1) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
     if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
       cat(
-        "Pomiędzy lipcem 2021 roku a momentem wypełnienia ankiety (badanie było realizowane w okresie od listopada 2021 do lutego 2022 roku), spośród absolwentów Państwa szkoły naukę w szkole branżowej drugiego stopnia, w liceum dla dorosłych lub na kwalifikacyjnym kursie zawodowym rozpoczęło ",
+        "Pomiędzy lipcem 2021 roku a momentem wypełnienia ankiety (badanie było realizowane w okresie od listopada 2021 do lutego 2022 roku), spośród absolwentów Państwa szkoły naukę w branżowej szkole drugiego stopnia, w liceum dla dorosłych lub na kwalifikacyjnym kursie zawodowym rozpoczęło ",
         round(szk$eduk_kontyn[[1]]$any_bs1 * 100),
         "%.",
         sep = ""
       )
     } else {
-      cat("Żaden z absolwentów Państwa szkoły nie kontynuował edukacji w szkole branżowej drugiego stopnia, w liceum dla dorosłych lub na kwalifikacyjnym kursie zawodowym.")
+      cat("Żaden z absolwentów Państwa szkoły nie kontynuował edukacji w branżowej szkole drugiego stopnia, w liceum dla dorosłych lub na kwalifikacyjnym kursie zawodowym.")
     }
   } else {
     cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
@@ -812,7 +822,7 @@ if (szk$TYP_SZK[[1]] %in% 1) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
 if (szk$TYP_SZK[[1]] %in% 1) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
-    if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
       tab1 = szk$eduk_kontyn[[1]] %>% 
         as_tibble() %>% 
         select(any_bs1) %>% 
@@ -831,11 +841,11 @@ if (szk$TYP_SZK[[1]] %in% 1) {
       
       tytul = wrapper(paste0(
         "Wykres ", wyk_num(),
-        ": Odsetek absolwentów, którzy po ukończeniu szkoły branżowej pierwszego stopnia kontynuowali naukę w dowolnej formie"),
+        ": Odsetek absolwentów, którzy po ukończeniu branżowej szkoły pierwszego stopnia kontynuowali naukę w dowolnej formie"),
         width = 80)
       
       ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
         scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
         labs(fill = NULL,
              title = tytul) +
@@ -850,7 +860,7 @@ if (szk$TYP_SZK[[1]] %in% 1) {
               plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
               plot.title = element_text(size = 12)) +
         geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
-    }
+    # }
   }
 }
 ```
@@ -858,9 +868,9 @@ if (szk$TYP_SZK[[1]] %in% 1) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
 if (szk$TYP_SZK[[1]] %in% 1) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
-    if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
       cat(
-        "*Wykres przedstawia odpowiedzi ",
+        "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
         szk$eduk_kontyn[[1]]$n,
         " absolwentów Państwa szkoły oraz ",
         round(woj$eduk_kontyn_WT[[1]]$n),
@@ -868,18 +878,26 @@ if (szk$TYP_SZK[[1]] %in% 1) {
         szk$formy[[1]]$typ_szk_dop_mn,
         " z województwa ",
         szk$formy[[1]]$woj_nazwa_dop,
-        ". Respondentom zadano pytanie “Czy po zakończeniu nauki w (...) szkole policealnej uczestniczył(a) Pan(i) w rekrutacji: (...) do szkoły policealnej?”. Respondenci wskazywali odpowiedź “Tak i rozpocząłem(a) tam naukę”, “Tak, ale nie rozpocząłem(am) tam nauki” lub “Nie”. Wykres uwzględnia pierwszą z tych odpowiedzi.*\n\n",
+        ". Respondentom zadano pytanie “Czy po zakończeniu nauki w (...) branżowej szkole I stopnia uczestniczył(a) Pan(i) w rekrutacji: (...) do branżowej szkoły II stopnia, (...) liceum dla dorosłych, (...) na kwalifikacyjny kurs zawodowy?”. Respondenci wskazywali odpowiedź “Tak i rozpocząłem(am) tam naukę”, “Tak, ale nie rozpocząłem(am) tam nauki” lub “Nie”. Wykres uwzględnia pierwszą z tych odpowiedzi.}*\n\n",
         sep = ""
       )
       
       cat(
-        "W szkole branżowej drugiego stopnia podjęło dalszą naukę ",
+        "W branżowej szkole drugiego stopnia podjęło dalszą naukę ",
         round(szk$eduk_kontyn[[1]]$bs2 * 100),
-        "% absolwentów Państwa szkoły, z którymi zostało przeprowadzone badanie.",
+        "% absolwentów Państwa szkoły, z którymi zostało przeprowadzone badanie. ",
         sep = ""
       )
-      
-      if (szk$eduk_kontyn[[1]]$bs2 > 0) {
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 1) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$bs2 > 0) {
         tab1 = szk$eduk_kontyn[[1]] %>% 
           as_tibble() %>% 
           select(bs2) %>% 
@@ -898,11 +916,11 @@ if (szk$TYP_SZK[[1]] %in% 1) {
         
         tytul = wrapper(paste0(
           "Wykres ", wyk_num(),
-          ": Odsetek absolwentów, którzy po ukończeniu szkoły branżowej I stopnia  kontynuowali naukę w branżowej szkole II stopnia"),
+          ": Odsetek absolwentów, którzy po ukończeniu branżowej szkoły pierwszego stopnia kontynuowali naukę w branżowej szkole drugiego stopnia"),
           width = 80)
         
-        ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+        wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
           scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
           labs(fill = NULL,
                title = tytul) +
@@ -917,19 +935,26 @@ if (szk$TYP_SZK[[1]] %in% 1) {
                 plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
                 plot.title = element_text(size = 12)) +
           geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
-      } else {
         
-      }
-      
-      
-      cat(
-        "W liceum dla dorosłych kontynuowało naukę ",
-        round(szk$eduk_kontyn[[1]]$lodd * 100),
-        "% absolwentów Państwa szkoły objętych badaniem.",
-        sep = ""
-      )
-      
-      if (szk$eduk_kontyn[[1]]$lodd > 0) {
+        print(wykres)
+    #   }
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 1) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_bs1 * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$lodd > 0) {
+        cat(
+          "W liceum dla dorosłych kontynuowało naukę ",
+          round(szk$eduk_kontyn[[1]]$lodd * 100),
+          "% absolwentów Państwa szkoły objętych badaniem. ",
+          sep = ""
+        )
+        
         tab1 = szk$eduk_kontyn[[1]] %>% 
           as_tibble() %>% 
           select(lodd) %>% 
@@ -948,11 +973,11 @@ if (szk$TYP_SZK[[1]] %in% 1) {
         
         tytul = wrapper(paste0(
           "Wykres ", wyk_num(),
-          ": Odsetek absolwentów, którzy po ukończeniu szkoły branżowej I stopnia  kontynuowali naukę w liceum dla dorosłych"),
+          ": Odsetek absolwentów, którzy po ukończeniu branżowej szkoły pierwszego stopnia kontynuowali naukę w liceum dla dorosłych"),
           width = 80)
         
-        ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+        wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
           scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
           labs(fill = NULL,
                title = tytul) +
@@ -967,8 +992,69 @@ if (szk$TYP_SZK[[1]] %in% 1) {
                 plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
                 plot.title = element_text(size = 12)) +
           geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
-      }
-    }
+        
+        print(wykres)
+    #   }
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 1) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$kkz > 0) {
+        
+        cat(
+          "Kwalifikacyjne kursy zawodowe okazały się formą kontynuowania nauki przez ",
+          round(szk$eduk_kontyn[[1]]$kkz * 100),
+          "% absolwentów Państwa szkoły, którzy wypełnili ankiety.\r\n\r\n",
+          sep = ""
+        )
+        
+        
+        tab1 = szk$eduk_kontyn[[1]] %>% 
+          as_tibble() %>% 
+          select(kkz) %>% 
+          pivot_longer(everything()) %>% 
+          mutate(lab = paste0(round(value * 100), "%"),
+                 typ = "Państwa szkoła")
+        
+        tab2 = woj$eduk_kontyn_WT[[1]] %>% 
+          as_tibble() %>% 
+          select(kkz) %>% 
+          pivot_longer(everything()) %>%   
+          mutate(lab = paste0(round(value * 100), "%"),
+                 typ = "Pozostałe szkoły\nz województwa")
+        
+        tab = rbind(tab1, tab2)
+        
+        tytul = wrapper(paste0(
+          "Wykres ", wyk_num(),
+          ": Odsetek absolwentów, którzy po ukończeniu branżowej szkoły pierwszego stopnia kontynuowali naukę na kwalifikacyjnym kursie zawodowym"),
+          width = 80)
+        
+        wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
+          scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+          labs(fill = NULL,
+               title = tytul) +
+          geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$value, 2) < 0.05, -1.3, 0.5)) +
+          ylab(NULL) +
+          xlab(NULL) +
+          coord_flip() +
+          theme(legend.position = "none",
+                panel.background = element_rect(fill = "white"),
+                axis.ticks.y = element_blank(),
+                axis.ticks.x = element_blank(),
+                plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+                plot.title = element_text(size = 12)) +
+          geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+        
+        print(wykres)
+    #   }
+    # }
   }
 }
 ```
@@ -997,7 +1083,7 @@ if (szk$TYP_SZK[[1]] %in% 2) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
 if (szk$TYP_SZK[[1]] %in% 2) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
-    if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
       tab1 = szk$eduk_kontyn[[1]] %>% 
         as_tibble() %>% 
         select(any_tech) %>% 
@@ -1020,7 +1106,7 @@ if (szk$TYP_SZK[[1]] %in% 2) {
         width = 80)
       
       ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
         scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
         labs(fill = NULL,
              title = tytul) +
@@ -1035,7 +1121,7 @@ if (szk$TYP_SZK[[1]] %in% 2) {
               plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
               plot.title = element_text(size = 12)) +
         geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
-    }
+    # }
   }
 }
 ```
@@ -1043,9 +1129,9 @@ if (szk$TYP_SZK[[1]] %in% 2) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
 if (szk$TYP_SZK[[1]] %in% 2) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
-    if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
       cat(
-        "*Wykres przedstawia odpowiedzi ",
+        "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
         szk$eduk_kontyn[[1]]$n,
         " absolwentów Państwa szkoły oraz ",
         round(woj$eduk_kontyn_WT[[1]]$n),
@@ -1053,18 +1139,27 @@ if (szk$TYP_SZK[[1]] %in% 2) {
         szk$formy[[1]]$typ_szk_dop_mn,
         " z województwa ",
         szk$formy[[1]]$woj_nazwa_dop,
-        ". Respondentom zadano pytanie “Czy po zakończeniu nauki w technikum próbował(a) się P. dostać: (...) do szkoły policealnej?; na studia na kierunku związanym z zawodem [zawód, w którym kształcił się respondent]; na studia na kierunku niezwiązanym z zawodem [zawód, w którym kształcił się respondent]?; na kwalifikacyjny kurs zawodowy (KKZ), czyli kurs, który kończy sie egzaminem zawodowym?”. Respondenci wskazywali odpowiedź “Tak i rozpocząłem(a) tam naukę”, “Tak, ale nie rozpocząłem(am) tam nauki” lub “Nie”. Wykres uwzględnia pierwszą z tych odpowiedzi.*\n\n",
+        ". Respondentom zadano pytanie “Czy po zakończeniu nauki w technikum próbował(a) się P. dostać: (...) do szkoły policealnej?; na studia na kierunku związanym z zawodem [zawód, w którym kształcił się respondent]; na studia na kierunku niezwiązanym z zawodem [zawód, w którym kształcił się respondent]?; na kwalifikacyjny kurs zawodowy (KKZ), czyli kurs, który kończy sie egzaminem zawodowym?”. Respondenci wskazywali odpowiedź “Tak i rozpocząłem(a) tam naukę”, “Tak, ale nie rozpocząłem(am) tam nauki” lub “Nie”. Wykres uwzględnia pierwszą z tych odpowiedzi.}*\n\n",
         sep = ""
       )
-      
-      cat(
-        "Studentami zostało ",
-        round(szk$eduk_kontyn[[1]]$stud_ogolem * 100),
-        "% absolwentów Państwa szkoły, z którymi przeprowadzono badanie.\r\n\r\n",
-        sep = ""
-      )
-      
-      if (szk$eduk_kontyn[[1]]$stud_ogolem > 0) {
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 2) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$stud_ogolem > 0) {
+        
+        cat(
+          "Studentami zostało ",
+          round(szk$eduk_kontyn[[1]]$stud_ogolem * 100),
+          "% absolwentów Państwa szkoły, z którymi przeprowadzono badanie.\r\n\r\n",
+          sep = ""
+        )
+        
         tab1 = szk$eduk_kontyn[[1]] %>% 
           as_tibble() %>% 
           select(stud_ogolem) %>% 
@@ -1087,7 +1182,7 @@ if (szk$TYP_SZK[[1]] %in% 2) {
           width = 80)
         
         wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
           scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
           labs(fill = NULL,
                title = tytul) +
@@ -1102,9 +1197,20 @@ if (szk$TYP_SZK[[1]] %in% 2) {
                 plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
                 plot.title = element_text(size = 12)) +
           geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+        
         print(wykres)
-      }
-      
+    #   }
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 2) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$spolic > 0) {
+        
         cat(
           "W szkole policealnej podjęło dalszą naukę ",
           round(szk$eduk_kontyn[[1]]$spolic * 100),
@@ -1112,7 +1218,6 @@ if (szk$TYP_SZK[[1]] %in% 2) {
           sep = ""
         )
         
-        if (szk$eduk_kontyn[[1]]$spolic > 0) {
         tab1 = szk$eduk_kontyn[[1]] %>% 
           as_tibble() %>% 
           select(spolic) %>% 
@@ -1135,7 +1240,7 @@ if (szk$TYP_SZK[[1]] %in% 2) {
           width = 80)
         
         wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
           scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
           labs(fill = NULL,
                title = tytul) +
@@ -1150,8 +1255,19 @@ if (szk$TYP_SZK[[1]] %in% 2) {
                 plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
                 plot.title = element_text(size = 12)) +
           geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+        
         print(wykres)
-        }
+    #   }
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 2) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$kkz > 0) {
         
         cat(
           "Kwalifikacyjne kursy zawodowe okazały się formą kontynuowania nauki przez ",
@@ -1160,47 +1276,48 @@ if (szk$TYP_SZK[[1]] %in% 2) {
           sep = ""
         )
         
-        if (szk$eduk_kontyn[[1]]$kkz > 0) {
-          tab1 = szk$eduk_kontyn[[1]] %>% 
-            as_tibble() %>% 
-            select(kkz) %>% 
-            pivot_longer(everything()) %>% 
-            mutate(lab = paste0(round(value * 100), "%"),
-                   typ = "Państwa szkoła")
-          
-          tab2 = woj$eduk_kontyn_WT[[1]] %>% 
-            as_tibble() %>% 
-            select(kkz) %>% 
-            pivot_longer(everything()) %>%   
-            mutate(lab = paste0(round(value * 100), "%"),
-                   typ = "Pozostałe szkoły\nz województwa")
-          
-          tab = rbind(tab1, tab2)
-          
-          tytul = wrapper(paste0(
-            "Wykres ", wyk_num(),
-            ": Odsetek absolwentów, którzy po ukończeniu technikum kontynuowali naukę na kwalifikacyjnym kursie zawodowym"),
-            width = 80)
-          
-          wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-            geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
-            scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
-            labs(fill = NULL,
-                 title = tytul) +
-            geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$value, 2) < 0.05, -1.3, 0.5)) +
-            ylab(NULL) +
-            xlab(NULL) +
-            coord_flip() +
-            theme(legend.position = "none",
-                  panel.background = element_rect(fill = "white"),
-                  axis.ticks.y = element_blank(),
-                  axis.ticks.x = element_blank(),
-                  plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
-                  plot.title = element_text(size = 12)) +
-            geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
-          print(wykres)
-        }
-    }
+        
+        tab1 = szk$eduk_kontyn[[1]] %>% 
+          as_tibble() %>% 
+          select(kkz) %>% 
+          pivot_longer(everything()) %>% 
+          mutate(lab = paste0(round(value * 100), "%"),
+                 typ = "Państwa szkoła")
+        
+        tab2 = woj$eduk_kontyn_WT[[1]] %>% 
+          as_tibble() %>% 
+          select(kkz) %>% 
+          pivot_longer(everything()) %>%   
+          mutate(lab = paste0(round(value * 100), "%"),
+                 typ = "Pozostałe szkoły\nz województwa")
+        
+        tab = rbind(tab1, tab2)
+        
+        tytul = wrapper(paste0(
+          "Wykres ", wyk_num(),
+          ": Odsetek absolwentów, którzy po ukończeniu technikum kontynuowali naukę na kwalifikacyjnym kursie zawodowym"),
+          width = 80)
+        
+        wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
+          scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+          labs(fill = NULL,
+               title = tytul) +
+          geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$value, 2) < 0.05, -1.3, 0.5)) +
+          ylab(NULL) +
+          xlab(NULL) +
+          coord_flip() +
+          theme(legend.position = "none",
+                panel.background = element_rect(fill = "white"),
+                axis.ticks.y = element_blank(),
+                axis.ticks.x = element_blank(),
+                plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+                plot.title = element_text(size = 12)) +
+          geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+        
+        print(wykres)
+    #   }
+    # }
   }
 }
 ```
@@ -1210,9 +1327,95 @@ if (szk$TYP_SZK[[1]] %in% 2) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$TYP_SZK[[1]] %in% 3) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) { # dla spolic i tech to jest ten sam zestaw możliwości kontynuowania edukacji, więc to "any_tech" jest ok
+      cat(
+        "Pomiędzy lipcem 2021 roku a momentem wypełnienia ankiety (badanie było realizowane w okresie od listopada 2021 do lutego 2022 roku), spośród absolwentów Państwa szkoły naukę na studiach lub na kwalifikacyjnym kursie zawodowym rozpoczęło ",
+        round(szk$eduk_kontyn[[1]]$any_tech * 100),
+        "%.",
+        sep = ""
+      )
+    } else {
+      cat("Żaden z absolwentów Państwa szkoły nie kontynuował edukacji na studiach lub na kwalifikacyjnym kursie zawodowym.")
+    }
+  } else {
+    cat("Odpowiedzi uzyskano od mniej niż 10 absolwentów Państwa szkoły - grupa ta jest zbyt mało liczna, żeby przedstawić wyniki.")
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 3) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+      tab1 = szk$eduk_kontyn[[1]] %>% 
+        as_tibble() %>% 
+        select(any_tech) %>% 
+        pivot_longer(everything()) %>% 
+        mutate(lab = paste0(round(value * 100), "%"),
+               typ = "Państwa szkoła")
+      
+      tab2 = woj$eduk_kontyn_WT[[1]] %>% 
+        as_tibble() %>% 
+        select(any_tech) %>% 
+        pivot_longer(everything()) %>%   
+        mutate(lab = paste0(round(value * 100), "%"),
+               typ = "Pozostałe szkoły\nz województwa")
+      
+      tab = rbind(tab1, tab2)
+      
+      tytul = wrapper(paste0(
+        "Wykres ", wyk_num(),
+        ": Odsetek absolwentów, którzy po ukończeniu szkoły policealnej kontynuowali naukę w dowolnej formie"),
+        width = 80)
+      
+      ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
+        scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+        labs(fill = NULL,
+             title = tytul) +
+        geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$value, 2) < 0.05, -1.3, 0.5)) +
+        ylab(NULL) +
+        xlab(NULL) +
+        coord_flip() +
+        theme(legend.position = "none",
+              panel.background = element_rect(fill = "white"),
+              axis.ticks.y = element_blank(),
+              axis.ticks.x = element_blank(),
+              plot.title.position = "plot",
+              plot.title = element_text(size = 12)) +
+        geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$TYP_SZK[[1]] %in% 3) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$kkz * 100) %in% 0)) {
+      cat(
+        "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
+        szk$eduk_kontyn[[1]]$n,
+        " absolwentów Państwa szkoły oraz ",
+        round(woj$eduk_kontyn_WT[[1]]$n),
+        " absolwentów innych ",
+        szk$formy[[1]]$typ_szk_dop_mn,
+        " z województwa ",
+        szk$formy[[1]]$woj_nazwa_dop,
+        ". Respondentom zadano pytanie “Czy po zakończeniu nauki w (...) szkole policealnej uczestniczył(a) Pan(i) w rekrutacji: (...) do szkoły policealnej, (...) na studia, (...) na kwalifikacyjny kurs zawodowy?”. Respondenci wskazywali odpowiedź “Tak i rozpocząłem(a) tam naukę”, “Tak, ale nie rozpocząłem(am) tam nauki” lub “Nie”. Wykres uwzględnia pierwszą z tych odpowiedzi.}*",
+        sep = ""
+      )
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$TYP_SZK[[1]] %in% 3) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
     if (!(round(szk$eduk_kontyn[[1]]$kkz * 100) %in% 0)) {
       cat(
-        "Pomiędzy lipcem 2021 roku a momentem wypełnienia ankiety (badanie było realizowane w okresie od listopada 2021 do lutego 2022 roku), spośród absolwentów Państwa szkoły naukę na kwalifikacyjnym kursie zawodowym rozpoczęło ",
+        "Spośród absolwentów Państwa szkoły naukę na kwalifikacyjnym kursie zawodowym rozpoczęło ",
         round(szk$eduk_kontyn[[1]]$kkz * 100),
         "%.",
         sep = ""
@@ -1229,7 +1432,7 @@ if (szk$TYP_SZK[[1]] %in% 3) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
 if (szk$TYP_SZK[[1]] %in% 3) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
-    if (!(round(szk$eduk_kontyn[[1]]$kkz * 100) %in% 0)) {
+    # if (!(round(szk$eduk_kontyn[[1]]$kkz * 100) %in% 0)) {
       tab1 = szk$eduk_kontyn[[1]] %>% 
         as_tibble() %>% 
         select(kkz) %>% 
@@ -1252,7 +1455,7 @@ if (szk$TYP_SZK[[1]] %in% 3) {
         width = 80)
       
       ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
-        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
         scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
         labs(fill = NULL,
              title = tytul) +
@@ -1267,7 +1470,7 @@ if (szk$TYP_SZK[[1]] %in% 3) {
               plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
               plot.title = element_text(size = 12)) +
         geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
-    }
+    # }
   }
 }
 ```
@@ -1275,20 +1478,122 @@ if (szk$TYP_SZK[[1]] %in% 3) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$TYP_SZK[[1]] %in% 3) {
   if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
-    if (!(round(szk$eduk_kontyn[[1]]$kkz * 100) %in% 0)) {
+    if (!(round(szk$eduk_kontyn[[1]]$stud_ogolem * 100) %in% 0)) {
       cat(
-        "*Wykres przedstawia odpowiedzi ",
-        szk$eduk_kontyn[[1]]$n,
-        " absolwentów Państwa szkoły oraz ",
-        round(woj$eduk_kontyn_WT[[1]]$n),
-        " absolwentów innych ",
-        szk$formy[[1]]$typ_szk_dop_mn,
-        " z województwa ",
-        szk$formy[[1]]$woj_nazwa_dop,
-        ". Respondentom zadano pytanie “Czy po zakończeniu nauki w (...) szkole policealnej uczestniczył(a) Pan(i) w rekrutacji: (...) do szkoły policealnej?”. Respondenci wskazywali odpowiedź “Tak i rozpocząłem(a) tam naukę”, “Tak, ale nie rozpocząłem(am) tam nauki” lub “Nie”. Wykres uwzględnia pierwszą z tych odpowiedzi.*",
+        "Studentami zostało ",
+        round(szk$eduk_kontyn[[1]]$stud_ogolem * 100),
+        "% absolwentów Państwa szkoły, z którymi przeprowadzono badanie.\r\n\r\n",
         sep = ""
       )
+    } else {
+      cat("Żaden z absolwentów Państwa szkoły nie kontynuował edukacji na studiach wyższych.")
     }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 3) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$stud_ogolem * 100) %in% 0)) {
+      tab1 = szk$eduk_kontyn[[1]] %>% 
+        as_tibble() %>% 
+        select(stud_ogolem) %>% 
+        pivot_longer(everything()) %>% 
+        mutate(lab = paste0(round(value * 100), "%"),
+               typ = "Państwa szkoła")
+      
+      tab2 = woj$eduk_kontyn_WT[[1]] %>% 
+        as_tibble() %>% 
+        select(stud_ogolem) %>% 
+        pivot_longer(everything()) %>%   
+        mutate(lab = paste0(round(value * 100), "%"),
+               typ = "Pozostałe szkoły\nz województwa")
+      
+      tab = rbind(tab1, tab2)
+      
+      tytul = wrapper(paste0(
+        "Wykres ", wyk_num(),
+        ": Odsetek absolwentów, którzy po ukończeniu szkoły policealnej kontynuowali naukę na studiach wyższych"),
+        width = 80)
+      
+      wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+        geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
+        scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+        labs(fill = NULL,
+             title = tytul) +
+        geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$value, 2) < 0.05, -1.3, 0.5)) +
+        ylab(NULL) +
+        xlab(NULL) +
+        coord_flip() +
+        theme(legend.position = "none",
+              panel.background = element_rect(fill = "white"),
+              axis.ticks.y = element_blank(),
+              axis.ticks.x = element_blank(),
+              plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+              plot.title = element_text(size = 12)) +
+        geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+      
+      print(wykres)
+    # }
+  }
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr, fig.height = 2.5}
+if (szk$TYP_SZK[[1]] %in% 3) {
+  if (szk$eduk_kontyn[[1]]$n >= progLiczebnosci) {
+    # if (!(round(szk$eduk_kontyn[[1]]$any_tech * 100) %in% 0)) {
+    #   if (szk$eduk_kontyn[[1]]$spolic > 0) {
+        
+        cat(
+          "W kolejnej szkole policealnej podjęło dalszą naukę ",
+          round(szk$eduk_kontyn[[1]]$spolic * 100),
+          "% absolwentów Państwa szkoły objętych badaniem.\r\n\r\n",
+          sep = ""
+        )
+        
+        tab1 = szk$eduk_kontyn[[1]] %>% 
+          as_tibble() %>% 
+          select(spolic) %>% 
+          pivot_longer(everything()) %>% 
+          mutate(lab = paste0(round(value * 100), "%"),
+                 typ = "Państwa szkoła")
+        
+        tab2 = woj$eduk_kontyn_WT[[1]] %>% 
+          as_tibble() %>% 
+          select(spolic) %>% 
+          pivot_longer(everything()) %>%   
+          mutate(lab = paste0(round(value * 100), "%"),
+                 typ = "Pozostałe szkoły\nz województwa")
+        
+        tab = rbind(tab1, tab2)
+        
+        tytul = wrapper(paste0(
+          "Wykres ", wyk_num(),
+          ": Odsetek absolwentów, którzy po ukończeniu szkoły policealnej kontynuowali naukę w kolejnej szkole policealnej"),
+          width = 80)
+        
+        wykres = ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value)) +
+          geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
+          scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+          labs(fill = NULL,
+               title = tytul) +
+          geom_text(aes(label = lab), position = position_stack(vjust = 0.5), size = 3, hjust = ifelse(round(tab$value, 2) < 0.05, -1.3, 0.5)) +
+          ylab(NULL) +
+          xlab(NULL) +
+          coord_flip() +
+          theme(legend.position = "none",
+                panel.background = element_rect(fill = "white"),
+                axis.ticks.y = element_blank(),
+                axis.ticks.x = element_blank(),
+                plot.title.position = "plot", # żeby tytuł był najbardziej po lewej
+                plot.title = element_text(size = 12)) +
+          geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25)
+        
+        print(wykres)
+    #   }
+    # }
   }
 }
 ```
@@ -1334,7 +1639,7 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
-    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
     scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
     labs(fill = NULL,
          title = tytul) +
@@ -1355,7 +1660,7 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$zgodnosc_pracy[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zgodnosc_pracy_WT[[1]]$n),
@@ -1363,7 +1668,7 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Czy od czasu ukończenia [typ szkoły, w której uczył się respondent], czyli od lipca 2021 roku w sumie przez co najmniej dwa tygodnie wykonywał(a) Pan(i) pracę zarobkową w: zawodzie [zawód, w którym kształcił się respondent]? (...)”. Respondenci wskazywali odpowiedź “Tak” lub “Nie”.*\n\n",
+    ". Respondentom zadano pytanie “Czy od czasu ukończenia [typ szkoły, w której uczył się respondent], czyli od lipca 2021 roku do [miesiąc poprzedzający miesiąc, w którym respondent wypełnia ankietę] 2021 roku w sumie przez co najmniej dwa tygodnie wykonywał(a) Pan(i) pracę zarobkową w: zawodzie [zawód, w którym kształcił się respondent]? (...)”. Respondenci wskazywali odpowiedź “Tak” lub “Nie”.}*\n\n",
     "Spośród absolwentów Państwa szkoły, którzy po zakończeniu w niej nauki pracowali ",
     round(szk$zgodnosc_pracy[[1]]$branza * 100),
     "% stwierdziło, że w tym okresie wprawdzie nie pracowali w wyuczonym zawodzie, ale pracowali w branży, do której ten zawód należy.",
@@ -1394,7 +1699,7 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = rozklad)) +
-    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#f768a1") +
+    geom_bar(width = 0.75, stat = "identity", colour = "white", fill = "#4daf49") +
     scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
     labs(fill = NULL,
          title = tytul) +
@@ -1415,7 +1720,7 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$zgodnosc_pracy[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zgodnosc_pracy_WT[[1]]$n),
@@ -1423,7 +1728,7 @@ if (szk$zgodnosc_pracy[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Czy od czasu ukończenia [typ szkoły, w której uczył się respondent] w okresie, czyli od lipca 2021 roku do [miesiąc poprzedzający miesiąc, w którym respondent wypełnia ankietę] 2020 roku w sumie przez co najmniej dwa tygodnie wykonywał(a) Pan(i) pracę zarobkową w: zawodzie [zawód, w którym kształcił się respondent]?; innym zawodzie, ale w branży [branża, w której kształcił się respondent]. Respondenci wskazywali odpowiedź “Tak” lub “Nie”. Na wykresie uwzględniono respondentów, którzy odpowiedzieli przecząco na pytanie dotyczące zawodu ale twierdząco na pytanie dotyczące branży.*",
+    ". Respondentom zadano pytanie “Czy od czasu ukończenia [typ szkoły, w której uczył się respondent] w okresie, czyli od lipca 2021 roku do [miesiąc poprzedzający miesiąc, w którym respondent wypełnia ankietę] 2021 roku w sumie przez co najmniej dwa tygodnie wykonywał(a) Pan(i) pracę zarobkową w: zawodzie [zawód, w którym kształcił się respondent]?; innym zawodzie, ale w branży [branża, w której kształcił się respondent]. Respondenci wskazywali odpowiedź “Tak” lub “Nie”. Na wykresie uwzględniono respondentów, którzy odpowiedzieli przecząco na pytanie dotyczące zawodu ale twierdząco na pytanie dotyczące branży.}*",
     sep = ""
   )
 }
@@ -1444,9 +1749,9 @@ if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
     if (round(szk$zad_ogolne[[1]]$t2b * 100) == round(szk$zad_ogolne[[1]]$b2b * 100)) {
       paste0("tyle samo absolwentów.")
     } else if (round(szk$zad_ogolne[[1]]$t2b * 100) > round(szk$zad_ogolne[[1]]$b2b * 100)) {
-      paste0("mniej, bo ", round(szk$zad_ogolne[[1]]$b2b * 100), "% absolwentów.")
+      paste0("mniej: ", round(szk$zad_ogolne[[1]]$b2b * 100), "% absolwentów.")
     } else if (round(szk$zad_ogolne[[1]]$t2b * 100) < round(szk$zad_ogolne[[1]]$b2b * 100)) {
-      paste0("więcej, bo: ", round(szk$zad_ogolne[[1]]$b2b * 100), "% absolwentów.")
+      paste0("więcej: ", round(szk$zad_ogolne[[1]]$b2b * 100), "% absolwentów.")
     },
     " Pozostali wybrali odpowiedź pośrednią (",
     round(szk$zad_ogolne[[1]]$ani_ani * 100),
@@ -1504,7 +1809,7 @@ if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
   
   tytul = wrapper(paste0(
     "Wykres ", wyk_num(),
-    ": Opinie absolwentów dotyczące ogólnego poziomu zadowolenia z podjętej pracy zarobkowej"),
+    ": Ogólny poziom zadowolenia absolwentów z podjętej pracy zarobkowej"),
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value, fill = name)) +
@@ -1525,14 +1830,14 @@ if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
     guides(fill = guide_legend(reverse = TRUE, nrow = 6, byrow = TRUE)) +
-    scale_fill_brewer(palette = "RdPu")
+    scale_fill_manual(values = c("#797979", "#b31cb5", "#b976b9", "#fffdb2", "#a1d669", "#4d9121"))
 }
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$zad_ogolne[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zad_ogolne_WT[[1]]$n),
@@ -1540,9 +1845,31 @@ if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę… ogólnie, biorąc wszystko pod uwagę”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę… ogólnie, biorąc wszystko pod uwagę”. Respondenci wskazywali odpowiedź: “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.}*",
     sep = ""
   )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_ogolne[[1]]$n >= progLiczebnosci) {
+  cat("Dane z wykresu przedstawiono w poniższej tabeli.")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-starts_with(c("lab", "typ"))) %>% 
+    mutate(across(starts_with("value"), ~paste0(round(. * 100), "\\%"))) %>% 
+    kable("latex",
+          booktabs = TRUE,
+          escape = FALSE,
+          longtable = TRUE,
+          linesep = "",
+          col.names = NULL,
+          align = "lcc",
+          format.args = list(decimal.mark = ",", big.mark = " ")) %>%
+    kable_styling(position = wyrownanieTabWykr) %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły\nz województwa" = 1),
+                     align = c("l", "c", "c"))
 }
 ```
 
@@ -1619,7 +1946,7 @@ if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
   
   tytul = wrapper(paste0(
     "Wykres ", wyk_num(),
-    ": Opinie absolwentów dotyczące poziomu zadowolenia z możliwości rozwoju zawodowego w podjętej pracy zarobkowej"),
+    ": Poziom zadowolenia absolwentów z możliwości rozwoju zawodowego w podjętej pracy zarobkowej"),
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value, fill = name)) +
@@ -1640,14 +1967,14 @@ if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
     guides(fill = guide_legend(reverse = TRUE, nrow = 6, byrow = TRUE)) +
-    scale_fill_brewer(palette = "RdPu")
+    scale_fill_manual(values = c("#797979", "#b31cb5", "#b976b9", "#fffdb2", "#a1d669", "#4d9121"))
 }
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$zad_rozwoj[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zad_rozwoj_WT[[1]]$n),
@@ -1655,9 +1982,31 @@ if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem możliwości doskonalenia umiejętności.”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem możliwości doskonalenia umiejętności.”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.}*",
     sep = ""
   )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_rozwoj[[1]]$n >= progLiczebnosci) {
+  cat("Dane z wykresu przedstawiono w poniższej tabeli.")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-starts_with(c("lab", "typ"))) %>% 
+    mutate(across(starts_with("value"), ~paste0(round(. * 100), "\\%"))) %>% 
+    kable("latex",
+          booktabs = TRUE,
+          escape = FALSE,
+          longtable = TRUE,
+          linesep = "",
+          col.names = NULL,
+          align = "lcc",
+          format.args = list(decimal.mark = ",", big.mark = " ")) %>%
+    kable_styling(position = wyrownanieTabWykr) %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły\nz województwa" = 1),
+                     align = c("l", "c", "c"))
 }
 ```
 
@@ -1674,9 +2023,9 @@ if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
     if (round(szk$zad_zycie[[1]]$t2b * 100) == round(szk$zad_zycie[[1]]$b2b * 100)) {
       paste0("tyle samo absolwentów.")
     } else if (round(szk$zad_zycie[[1]]$t2b * 100) > round(szk$zad_zycie[[1]]$b2b * 100)) {
-      paste0("mniej absolwentów.: ", round(szk$zad_zycie[[1]]$b2b * 100), "%.")
+      paste0("mniej absolwentów: ", round(szk$zad_zycie[[1]]$b2b * 100), "%.")
     } else if (round(szk$zad_zycie[[1]]$t2b * 100) < round(szk$zad_zycie[[1]]$b2b * 100)) {
-      paste0("więcej absolwentów, bo ", round(szk$zad_zycie[[1]]$b2b * 100), "%.")
+      paste0("więcej absolwentów: ", round(szk$zad_zycie[[1]]$b2b * 100), "%.")
     },
     " Pozostali wybrali odpowiedź pośrednią (",
     round(szk$zad_zycie[[1]]$ani_ani * 100),
@@ -1734,7 +2083,7 @@ if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
   
   tytul = wrapper(paste0(
     "Wykres ", wyk_num(),
-    ": Opinie absolwentów dotyczące poziomu zadowolenia z możliwości godzenia pracy zarobkowej z życiem poza pracą"),
+    ": Poziom zadowolenia absolwentów z możliwości godzenia pracy zarobkowej z życiem poza pracą"),
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value, fill = name)) +
@@ -1755,14 +2104,15 @@ if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
     guides(fill = guide_legend(reverse = TRUE, nrow = 6, byrow = TRUE)) +
-    scale_fill_brewer(palette = "RdPu")
+    scale_fill_manual(values = c("#797979", "#b31cb5", "#b976b9", "#fffdb2", "#a1d669", "#4d9121"))
+    # scale_fill_brewer(palette = "RdPu")
 }
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{*Wykres przedstawia odpowiedzi ",
     szk$zad_zycie[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zad_zycie_WT[[1]]$n),
@@ -1770,9 +2120,31 @@ if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem możliwości łączenia pracy z życiem poza pracą”. Respondenci wskazywali odpowiedź: “Bardzo dobrze”, “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem możliwości łączenia pracy z życiem poza pracą”. Respondenci wskazywali odpowiedź: “Bardzo dobrze”, “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.}*",
     sep = ""
   )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_zycie[[1]]$n >= progLiczebnosci) {
+  cat("Dane z wykresu przedstawiono w poniższej tabeli.")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-starts_with(c("lab", "typ"))) %>% 
+    mutate(across(starts_with("value"), ~paste0(round(. * 100), "\\%"))) %>% 
+    kable("latex",
+          booktabs = TRUE,
+          escape = FALSE,
+          longtable = TRUE,
+          linesep = "",
+          col.names = NULL,
+          align = "lcc",
+          format.args = list(decimal.mark = ",", big.mark = " ")) %>%
+    kable_styling(position = wyrownanieTabWykr) %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły\nz województwa" = 1),
+                     align = c("l", "c", "c"))
 }
 ```
 
@@ -1789,9 +2161,9 @@ if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
     if (round(szk$zad_zarobki[[1]]$t2b * 100) == round(szk$zad_zarobki[[1]]$b2b * 100)) {
       paste0("tyle samo absolwentów.")
     } else if (round(szk$zad_zarobki[[1]]$t2b * 100) > round(szk$zad_zarobki[[1]]$b2b * 100)) {
-      paste0("mniej absolwentów, bo ", round(szk$zad_zarobki[[1]]$b2b * 100), "%.")
+      paste0("mniej absolwentów: ", round(szk$zad_zarobki[[1]]$b2b * 100), "%.")
     } else if (round(szk$zad_zarobki[[1]]$t2b * 100) < round(szk$zad_zarobki[[1]]$b2b * 100)) {
-      paste0("więcej absolwentów, bo ", round(szk$zad_zarobki[[1]]$b2b * 100), "%.")
+      paste0("więcej absolwentów: ", round(szk$zad_zarobki[[1]]$b2b * 100), "%.")
     },
     " Pozostali wybrali odpowiedź pośrednią (",
     round(szk$zad_zarobki[[1]]$ani_ani * 100),
@@ -1849,7 +2221,7 @@ if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
   
   tytul = wrapper(paste0(
     "Wykres ", wyk_num(),
-    ": Opinie absolwentów dotyczące poziomu satysfakcji z uzyskiwanych zarobków"),
+    ": Poziom zadowolenia absolwentów z uzyskiwanych zarobków"),
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value, fill = name)) +
@@ -1870,14 +2242,14 @@ if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
     guides(fill = guide_legend(reverse = TRUE, nrow = 6, byrow = TRUE)) +
-    scale_fill_brewer(palette = "RdPu")
+    scale_fill_manual(values = c("#797979", "#b31cb5", "#b976b9", "#fffdb2", "#a1d669", "#4d9121"))
 }
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$zad_zarobki[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zad_zarobki_WT[[1]]$n),
@@ -1885,9 +2257,31 @@ if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem zarobków”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem zarobków”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.}*",
     sep = ""
   )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_zarobki[[1]]$n >= progLiczebnosci) {
+  cat("Dane z wykresu przedstawiono w poniższej tabeli.")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-starts_with(c("lab", "typ"))) %>% 
+    mutate(across(starts_with("value"), ~paste0(round(. * 100), "\\%"))) %>% 
+    kable("latex",
+          booktabs = TRUE,
+          escape = FALSE,
+          longtable = TRUE,
+          linesep = "",
+          col.names = NULL,
+          align = "lcc",
+          format.args = list(decimal.mark = ",", big.mark = " ")) %>%
+    kable_styling(position = wyrownanieTabWykr) %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły\nz województwa" = 1),
+                     align = c("l", "c", "c"))
 }
 ```
 
@@ -1904,9 +2298,9 @@ if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
     if (round(szk$zad_utrzym[[1]]$t2b * 100) == round(szk$zad_utrzym[[1]]$b2b * 100)) {
       paste0("tyle samo absolwentów.")
     } else if (round(szk$zad_utrzym[[1]]$t2b * 100) > round(szk$zad_utrzym[[1]]$b2b * 100)) {
-      paste0("mniej absolwentów, bo ", round(szk$zad_utrzym[[1]]$b2b * 100), "%.")
+      paste0("mniej absolwentów: ", round(szk$zad_utrzym[[1]]$b2b * 100), "%.")
     } else if (round(szk$zad_utrzym[[1]]$t2b * 100) < round(szk$zad_utrzym[[1]]$b2b * 100)) {
-      paste0("więcej absolwentów, bo ", round(szk$zad_utrzym[[1]]$b2b * 100), "%.")
+      paste0("więcej absolwentów: ", round(szk$zad_utrzym[[1]]$b2b * 100), "%.")
     },
     " Pozostali wybrali odpowiedź pośrednią (",
     round(szk$zad_utrzym[[1]]$ani_ani * 100),
@@ -1964,7 +2358,7 @@ if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
   
   tytul = wrapper(paste0(
     "Wykres ", wyk_num(),
-    ": Opinie absolwentów dotyczące poziomu zadowolenia ze stabilności pracy zarobkowej"),
+    ": Poziom zadowolenia absolwentów ze stabilności pracy zarobkowej"),
     width = 80)
   
   ggplot(tab, aes(x = reorder(typ, desc(typ)), y = value, fill = name)) +
@@ -1985,14 +2379,14 @@ if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
           plot.title = element_text(size = 12)) +
     geom_rect(xmin = 0.5, xmax = 2.5, ymin = 0, ymax = 1, colour = "black", alpha = 0, size = 0.25) +
     guides(fill = guide_legend(reverse = TRUE, nrow = 6, byrow = TRUE)) +
-    scale_fill_brewer(palette = "RdPu")
+    scale_fill_manual(values = c("#797979", "#b31cb5", "#b976b9", "#fffdb2", "#a1d669", "#4d9121"))
 }
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
 if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
   cat(
-    "*Wykres przedstawia odpowiedzi ",
+    "*\\textcolor{gray}{Wykres przedstawia odpowiedzi ",
     szk$zad_utrzym[[1]]$n,
     " absolwentów Państwa szkoły oraz ",
     round(woj$zad_utrzym_WT[[1]]$n),
@@ -2000,9 +2394,31 @@ if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
     szk$formy[[1]]$typ_szk_dop_mn,
     " z województwa ",
     szk$formy[[1]]$woj_nazwa_dop,
-    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem pewności zatrudnienia / utrzymania pracy”. Respondenci wskazywali odpowiedź:  “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.*",
+    ". Respondentom zadano pytanie “Proszę pomyśleć o pierwszej pracy jaką przez co najmniej dwa tygodnie wykonywał(a) Pan(i) po zakończeniu nauki w [typ szkoły w której uczył się respondent]. Jak Pan(i) ocenia tę pracę … pod względem pewności zatrudnienia / utrzymania pracy”. Respondenci wskazywali odpowiedź: “Bardzo dobrze” , “Dobrze”, “Przeciętnie”, “Źle”, “Bardzo źle”, “Trudno mi ocenić pracę pod tym względem”.}*",
     sep = ""
   )
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.align=wyrownanieTabWykr}
+if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
+  cat("Dane z wykresu przedstawiono w poniższej tabeli.")
+  
+  tab1 %>% 
+    left_join(tab2, by = "name") %>% 
+    select(-starts_with(c("lab", "typ"))) %>% 
+    mutate(across(starts_with("value"), ~paste0(round(. * 100), "\\%"))) %>% 
+    kable("latex",
+          booktabs = TRUE,
+          escape = FALSE,
+          longtable = TRUE,
+          linesep = "",
+          col.names = NULL,
+          align = "lcc",
+          format.args = list(decimal.mark = ",", big.mark = " ")) %>%
+    kable_styling(position = wyrownanieTabWykr) %>% 
+    add_header_above(c(" ", "Państwa szkoła" = 1, "Pozostałe szkoły\nz województwa" = 1),
+                     align = c("l", "c", "c"))
 }
 ```
 
@@ -2010,6 +2426,6 @@ if (szk$zad_utrzym[[1]]$n >= progLiczebnosci) {
 
 `r ifelse(typDokumentu %in% "pdf", "---", "")`
 
-Więcej informacji o wynikach badania znajdą Państwo na stronie:
+Więcej informacji o monitoringu karier absolwentów znajdą Państwo na stronie:
 
 <https://losyabsolwentow.ibe.edu.pl/>
